@@ -31,7 +31,6 @@ body {
   color: var(--text);
   font-family: 'Syne', sans-serif;
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
 body::before {
@@ -41,7 +40,6 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.6;
 }
 
 body::after {
@@ -84,7 +82,6 @@ header {
   font-size: 1.4rem;
   font-weight: 800;
   color: var(--accent);
-  letter-spacing: -0.03em;
 }
 
 .logo-sub {
@@ -93,6 +90,13 @@ header {
   color: var(--muted);
   letter-spacing: 0.15em;
   text-transform: uppercase;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 #connectBtn {
@@ -117,7 +121,71 @@ header {
 #connectBtn.connected {
   border-color: var(--green);
   color: var(--green);
+}
+
+.setup-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 24px;
+  border-radius: 6px;
+}
+
+.setup-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.field {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
+  color: var(--subtext);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.field input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  padding: 10px 14px;
+  outline: none;
+  border-radius: 4px;
+}
+
+.field input:focus {
+  border-color: var(--accent);
+}
+
+.btn-load {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 11px 24px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+  transition: opacity 0.15s;
+}
+
+.btn-load:hover {
+  opacity: 0.85;
 }
 
 .tabs {
@@ -163,7 +231,6 @@ header {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 36px;
 }
 
 .bet-item {
@@ -257,267 +324,17 @@ header {
   color: var(--subtext);
 }
 
-.market-card {
-  display: none;
-}
-
-.market-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.market-question {
-  font-size: 1.55rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  max-width: 580px;
-}
-
-.phase-badge {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  padding: 6px 14px;
-  border: 1px solid;
-  white-space: nowrap;
-  margin-top: 4px;
-  border-radius: 4px;
-}
-
-.phase-open {
-  border-color: var(--green);
-  color: var(--green);
-}
-
-.phase-proposed {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.phase-settled {
-  border-color: var(--muted);
-  color: var(--muted);
-}
-
-.odds-block {
-  margin-bottom: 32px;
-}
-
-.odds-labels {
-  display: flex;
-  justify-content: space-between;
-  font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  color: var(--subtext);
-  margin-bottom: 8px;
-}
-
-.odds-bar {
-  height: 6px;
-  background: var(--border);
-  overflow: hidden;
-  position: relative;
-  border-radius: 3px;
-}
-
-.odds-yes-bar {
-  height: 100%;
-  background: var(--green);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.odds-pct {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-.odds-pct span {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-
-.yes-pct {
-  color: var(--green);
-}
-
-.no-pct {
-  color: var(--red);
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border);
-  margin-bottom: 32px;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.stat {
-  background: var(--surface);
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.stat-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.stat-value {
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.action-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 28px 32px;
-  margin-bottom: 24px;
-  border-radius: 6px;
-}
-
-.action-title {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 20px;
-}
-
-.bet-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.bet-input-wrap {
-  flex: 1;
-  min-width: 140px;
-}
-
-.bet-input-wrap label {
-  display: block;
-  font-family: 'DM Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--subtext);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.bet-input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  font-size: 0.85rem;
-  padding: 10px 14px;
-  outline: none;
-  transition: border-color 0.15s;
-  border-radius: 4px;
-}
-
-.bet-input:focus {
-  border-color: var(--accent);
-}
-
-.btn-bet {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 11px 18px;
-  border: none;
-  cursor: pointer;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  transition: opacity 0.15s;
-  border-radius: 4px;
-}
-
-.btn-yes {
-  background: var(--green);
-  color: var(--bg);
-}
-
-.btn-yes:hover:not(:disabled) {
-  opacity: 0.85;
-}
-
-.btn-no {
-  background: var(--red);
-  color: var(--bg);
-}
-
-.btn-no:hover:not(:disabled) {
-  opacity: 0.85;
-}
-
-.btn-bet:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.btn-claim {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 11px 24px;
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  cursor: pointer;
-  letter-spacing: 0.06em;
-  transition: opacity 0.15s;
-  border-radius: 4px;
-}
-
-.btn-claim:hover {
-  opacity: 0.85;
-}
-
-.log-section {
-  margin-bottom: 20px;
-}
-
-.log-title {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-
 .log {
   background: var(--bg);
   border: 1px solid var(--border);
   padding: 12px;
-  max-height: 120px;
+  max-height: 200px;
   overflow-y: auto;
   font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   line-height: 1.4;
   border-radius: 4px;
+  margin-top: 12px;
 }
 
 .log div {
@@ -534,6 +351,43 @@ header {
 
 .log .err {
   color: var(--red);
+}
+
+.market-card {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+  border-radius: 6px;
+  margin-top: 24px;
+}
+
+.market-question {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.market-stat {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+
+.market-stat:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: var(--subtext);
+  font-size: 0.85rem;
+}
+
+.stat-value {
+  font-weight: 600;
+  font-family: 'DM Mono', monospace;
+  color: var(--green);
 }
 
 .back-btn {
@@ -567,14 +421,6 @@ header {
     width: 100%;
     justify-content: space-between;
   }
-
-  .stats {
-    grid-template-columns: 1fr;
-  }
-
-  .btn-bet {
-    width: 100%;
-  }
 }
 </style>
 </head>
@@ -586,97 +432,58 @@ header {
       <div class="logo-mark">⬢</div>
       <div class="logo-sub">Group 4<br>Prediction Market</div>
     </div>
-    <button id="connectBtn">Connect MetaMask</button>
+    <div class="header-actions">
+      <button id="connectBtn">Connect MetaMask</button>
+    </div>
   </header>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('browse')">🎯 Active Bets</button>
-    <button class="tab-btn" onclick="switchTab('history')">📊 Past Bets</button>
-    <button class="tab-btn" onclick="switchTab('detail')">Market Details</button>
-  </div>
-
-  <!-- Active Bets Tab -->
-  <div id="browseTab" class="tab-content active">
-    <div class="bets-list" id="activeBetsList"></div>
-    <div id="activeBetsEmpty" class="empty-message" style="display:none;">
-      <div>Loading active bets from blockchain...</div>
+  <div class="setup-panel">
+    <div class="setup-row">
+      <div class="field" style="flex: 2;">
+        <label>Contract Address</label>
+        <input type="text" id="contractAddress" placeholder="0x..." value="0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4">
+      </div>
+      <button class="btn-load" onclick="loadMarkets()">Load Markets</button>
     </div>
+    <div class="log" id="statusLog"></div>
   </div>
 
-  <!-- Past Bets Tab -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('active')">🎯 Active</button>
+    <button class="tab-btn" onclick="switchTab('history')">📊 Past</button>
+  </div>
+
+  <div id="activeTab" class="tab-content active">
+    <div class="bets-list" id="activeBetsList"></div>
+    <div id="activeBetsEmpty" class="empty-message" style="display:none;">No active bets</div>
+  </div>
+
   <div id="historyTab" class="tab-content">
     <div class="bets-list" id="pastBetsList"></div>
-    <div id="pastBetsEmpty" class="empty-message" style="display:none;">
-      <div>No past bets found</div>
-    </div>
+    <div id="pastBetsEmpty" class="empty-message" style="display:none;">No past bets</div>
   </div>
 
-  <!-- Detail Tab -->
-  <div id="detailTab" class="tab-content">
-    <button class="back-btn" onclick="switchTab('browse')">← Back to Bets</button>
+  <button class="back-btn" onclick="switchTab('active')" style="display:none;" id="backBtn">← Back</button>
 
-    <div class="market-card" id="marketCard">
-      <div class="market-header">
-        <div class="market-question" id="marketQuestion"></div>
-        <div class="phase-badge" id="phaseBadge"></div>
-      </div>
-
-      <div class="odds-block">
-        <div class="odds-labels">
-          <span>YES</span>
-          <span>NO</span>
-        </div>
-        <div class="odds-bar">
-          <div class="odds-yes-bar" id="oddsYes" style="width: 50%"></div>
-        </div>
-        <div class="odds-pct">
-          <span class="yes-pct" id="yesPct">50%</span>
-          <span class="no-pct" id="noPct">50%</span>
-        </div>
-      </div>
-
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Total Pot</div>
-          <div class="stat-value" id="totalPot">0 ETH</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Time Left</div>
-          <div class="stat-value" id="countdown">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Your Position</div>
-          <div class="stat-value" id="yourPosition">—</div>
-        </div>
-      </div>
-
-      <div class="action-panel" id="bettingPanel">
-        <div class="action-title">Place a Bet</div>
-        <div class="bet-row">
-          <div class="bet-input-wrap">
-            <label>Amount (ETH)</label>
-            <input type="number" id="betAmount" placeholder="0.01" step="0.001">
-          </div>
-          <button class="btn-bet btn-yes" id="btnYes" onclick="placeBet(true)">Bet YES</button>
-          <button class="btn-bet btn-no" id="btnNo" onclick="placeBet(false)">Bet NO</button>
-        </div>
-      </div>
-
-      <div id="claimSection" style="display:none;">
-        <button class="btn-claim" id="btnClaim" onclick="claimWinnings()">Claim Winnings</button>
-      </div>
-
-      <div class="log-section">
-        <div class="log-title">Status</div>
-        <div class="log" id="statusLog"></div>
-      </div>
+  <div class="market-card" id="marketCard">
+    <div class="market-question" id="marketQuestion"></div>
+    <div class="market-stat">
+      <span class="stat-label">Total Pool</span>
+      <span class="stat-value" id="marketPool">0 ETH</span>
+    </div>
+    <div class="market-stat">
+      <span class="stat-label">YES / NO</span>
+      <span class="stat-value" id="marketOdds">50% / 50%</span>
+    </div>
+    <div class="market-stat">
+      <span class="stat-label">Status</span>
+      <span class="stat-value" id="marketStatus">Open</span>
     </div>
   </div>
 </div>
 
 <script>
 const SEPOLIA_RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
-const CONTRACT_ADDRESS = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
 
 const CONTRACT_ABI = [
   "function getMarketCount() public view returns (uint256)",
@@ -687,114 +494,84 @@ const CONTRACT_ABI = [
   "function claim(uint256 marketId) public"
 ];
 
-let provider, signer, contract, userAddress;
+let provider, signer, contract;
 let allMarkets = [];
 let selectedMarketId = null;
-let countdownTimer = null;
 
-document.addEventListener("DOMContentLoaded", async () => {
-  if (window.ethereum) {
-    window.ethereum.on("accountsChanged", accounts => {
-      if (accounts.length === 0) {
-        document.getElementById("connectBtn").textContent = "Connect MetaMask";
-        document.getElementById("connectBtn").classList.remove("connected");
-        userAddress = null;
-        signer = null;
-      } else {
-        connectWallet();
-      }
-    });
-  }
-  document.getElementById("connectBtn").onclick = connectWallet;
-  await loadAllMarkets();
-});
+document.getElementById("connectBtn").onclick = connectWallet;
 
 async function connectWallet() {
   try {
     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-    userAddress = accounts[0];
-    provider = new ethers.BrowserProvider(window.ethereum);
-    signer = await provider.getSigner();
-    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-
     const btn = document.getElementById("connectBtn");
-    btn.textContent = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+    btn.textContent = accounts[0].slice(0, 6) + "..." + accounts[0].slice(-4);
     btn.classList.add("connected");
-
-    log("statusLog", "✓ Wallet connected: " + userAddress, "ok");
-    await renderBetsList();
+    log("✓ Wallet connected", "ok");
   } catch(e) {
-    log("statusLog", "Connection failed: " + e.message, "err");
+    log("Connection failed: " + e.message, "err");
   }
 }
 
-async function loadAllMarkets() {
-  try {
-    provider = new ethers.JsonRpcProvider(SEPOLIA_RPC);
-    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+async function loadMarkets() {
+  const contractAddr = document.getElementById("contractAddress").value.trim();
+  
+  if (!contractAddr || !contractAddr.startsWith("0x")) {
+    log("Invalid contract address", "err");
+    return;
+  }
 
+  try {
+    log("Connecting to RPC...", "info");
+    provider = new ethers.JsonRpcProvider(SEPOLIA_RPC);
+    contract = new ethers.Contract(contractAddr, CONTRACT_ABI, provider);
+
+    log("Fetching market count...", "info");
     const count = await contract.getMarketCount();
     const countNum = parseInt(count.toString());
-
-    log("statusLog", `Loading ${countNum} markets...`, "info");
+    
+    log(`Found ${countNum} markets, loading...`, "info");
 
     allMarkets = [];
     for (let i = 0; i < countNum; i++) {
       try {
         const market = await contract.markets(i);
-        let userBets = { 0: 0n, 1: 0n };
-
-        if (userAddress) {
-          userBets = await contract.userBets(userAddress, i);
-        }
-
         allMarkets.push({
           id: i,
           creator: market[0],
           question: market[1],
-          creationTime: market[2],
           deadline: market[3],
-          phaseEndTime: market[4],
           phase: market[5],
           potYes: market[6],
-          potNo: market[7],
-          potAtSettle: market[8],
-          deciderFee: market[9],
-          outcomeYes: market[10],
-          yesAuditor: market[11],
-          noAuditor: market[12],
-          finalDecider: market[13],
-          userYes: userBets[0],
-          userNo: userBets[1]
+          potNo: market[7]
         });
+        log(`✓ Market ${i} loaded`, "ok");
       } catch(e) {
-        console.error(`Error loading market ${i}:`, e);
+        log(`✗ Market ${i} error`, "err");
       }
     }
 
-    log("statusLog", `✓ Loaded ${allMarkets.length} markets`, "ok");
-    await renderBetsList();
+    log(`✓ All ${allMarkets.length} markets loaded!`, "ok");
+    renderBets();
   } catch(e) {
-    log("statusLog", "Error loading markets: " + e.message, "err");
-    document.getElementById("activeBetsEmpty").style.display = "block";
+    log("Error: " + e.message, "err");
   }
 }
 
-async function renderBetsList() {
+function renderBets() {
   const now = Math.floor(Date.now() / 1000);
+  
+  const active = allMarkets.filter(m => m.phase < 2 && m.deadline > now);
+  const past = allMarkets.filter(m => m.phase === 2 || (m.deadline <= now && m.phase < 2));
 
-  const activeBets = allMarkets.filter(m => m.phase < 2 && m.deadline > now);
-  const pastBets = allMarkets.filter(m => m.phase === 2 || (m.deadline <= now && m.phase < 2));
-
-  renderMarkets(activeBets, "activeBetsList", "activeBetsEmpty");
-  renderMarkets(pastBets, "pastBetsList", "pastBetsEmpty");
+  renderList(active, "activeBetsList", "activeBetsEmpty");
+  renderList(past, "pastBetsList", "pastBetsEmpty");
 }
 
-function renderMarkets(markets, listId, emptyId) {
+function renderList(bets, listId, emptyId) {
   const list = document.getElementById(listId);
   const empty = document.getElementById(emptyId);
 
-  if (markets.length === 0) {
+  if (bets.length === 0) {
     list.innerHTML = "";
     empty.style.display = "block";
     return;
@@ -803,193 +580,101 @@ function renderMarkets(markets, listId, emptyId) {
   empty.style.display = "none";
   list.innerHTML = "";
 
-  markets.forEach(market => {
+  bets.forEach(m => {
     const item = document.createElement("div");
     item.className = "bet-item";
-    item.onclick = () => selectMarket(market.id);
+    item.onclick = () => selectMarket(m.id);
+
+    const total = m.potYes + m.potNo;
+    const yesP = total > 0 ? (Number(m.potYes) / Number(total) * 100).toFixed(0) : 50;
+    const noP = 100 - yesP;
 
     const now = Math.floor(Date.now() / 1000);
-    const totalPot = market.potYes + market.potNo;
-    const yesPercentage = totalPot > 0 ? (Number(market.potYes) / Number(totalPot) * 100).toFixed(0) : 50;
-    const noPercentage = 100 - yesPercentage;
-
     let status = "Open";
     let statusClass = "status-open";
-    if (market.phase === 2) {
+    if (m.phase === 2) {
       status = "Resolved";
       statusClass = "status-resolved";
-    } else if (market.phase === 1) {
+    } else if (m.phase === 1) {
       status = "Proposed";
       statusClass = "status-proposed";
     }
 
-    let timeText = "Closed";
-    if (market.phase < 2 && market.deadline > now) {
-      const remaining = market.deadline - now;
+    let time = "Closed";
+    if (m.phase < 2 && m.deadline > now) {
+      const remaining = m.deadline - now;
       const days = Math.floor(remaining / 86400);
       const hours = Math.floor((remaining % 86400) / 3600);
-      timeText = `${days}d ${hours}h`;
+      time = `${days}d ${hours}h`;
     }
 
-    const poolETH = ethers.formatEther(totalPot);
+    const pool = ethers.formatEther(total);
 
     item.innerHTML = `
       <div class="bet-item-left">
-        <div class="bet-item-question">${market.question}</div>
+        <div class="bet-item-question">${m.question}</div>
         <div class="bet-item-meta">
-          <span>💰 ${parseFloat(poolETH).toFixed(3)} ETH</span>
-          <span>⏱ ${timeText}</span>
+          <span>💰 ${parseFloat(pool).toFixed(3)} ETH</span>
+          <span>⏱ ${time}</span>
         </div>
       </div>
       <div class="bet-item-right">
         <div class="bet-odds">
-          <span class="odds-yes">${yesPercentage}%</span>
-          <span class="odds-no">${noPercentage}%</span>
+          <span class="odds-yes">${yesP}%</span>
+          <span class="odds-no">${noP}%</span>
         </div>
         <div class="bet-status ${statusClass}">${status}</div>
       </div>
     `;
-
+    
     list.appendChild(item);
   });
 }
 
 function selectMarket(id) {
-  selectedMarketId = id;
-  updateUI();
-  switchTab('detail');
+  const m = allMarkets[id];
+  document.getElementById("marketQuestion").textContent = m.question;
+  document.getElementById("marketPool").textContent = ethers.formatEther(m.potYes + m.potNo).slice(0, 8) + " ETH";
+  
+  const total = m.potYes + m.potNo;
+  const yesP = total > 0 ? (Number(m.potYes) / Number(total) * 100).toFixed(1) : 50;
+  document.getElementById("marketOdds").textContent = `${yesP}% / ${(100 - yesP).toFixed(1)}%`;
+  
+  const phaseNames = ["Open", "Proposed", "Resolved"];
+  document.getElementById("marketStatus").textContent = phaseNames[m.phase];
+  
+  document.getElementById("marketCard").style.display = "block";
+  document.getElementById("backBtn").style.display = "block";
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-  document.getElementById(tab + 'Tab').classList.add('active');
-  event.target.classList.add('active');
-}
-
-async function updateUI() {
-  if (selectedMarketId === null) return;
-
-  try {
-    if (!signer) {
-      provider = new ethers.JsonRpcProvider(SEPOLIA_RPC);
-      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-    }
-
-    const m = allMarkets.find(x => x.id === selectedMarketId);
-    if (!m) return;
-
-    document.getElementById("marketCard").style.display = "block";
-    document.getElementById("marketQuestion").textContent = m.question;
-
-    const now = Math.floor(Date.now() / 1000);
-    const phase = m.phase;
-    const deadline = m.deadline;
-
-    const badge = document.getElementById("phaseBadge");
-    badge.textContent = phase === 2 ? "SETTLED" : phase === 1 ? "PROPOSED" : "OPEN";
-    badge.className = phase === 2 ? "phase-badge phase-settled" : phase === 1 ? "phase-badge phase-proposed" : "phase-badge phase-open";
-
-    const totalPot = m.potYes + m.potNo;
-    const yesPercentage = totalPot > 0 ? Number(m.potYes) / Number(totalPot) : 0.5;
-    document.getElementById("oddsYes").style.width = (yesPercentage * 100) + "%";
-    document.getElementById("yesPct").textContent = (yesPercentage * 100).toFixed(1) + "%";
-    document.getElementById("noPct").textContent = ((1 - yesPercentage) * 100).toFixed(1) + "%";
-
-    const potETH = ethers.formatEther(totalPot);
-    document.getElementById("totalPot").textContent = parseFloat(potETH).toFixed(5) + " ETH";
-
-    const yETH = ethers.formatEther(m.userYes);
-    const nETH = ethers.formatEther(m.userNo);
-    let posText = "—";
-    if (m.userYes > 0n) posText = parseFloat(yETH).toFixed(3) + " ETH on YES";
-    if (m.userNo > 0n) posText = parseFloat(nETH).toFixed(3) + " ETH on NO";
-    document.getElementById("yourPosition").textContent = posText;
-
-    startCountdown(deadline, phase);
-
-    const expired = now >= deadline;
-    document.getElementById("bettingPanel").style.display = phase === 0 && !expired ? "block" : "none";
-    document.getElementById("claimSection").style.display = phase === 2 && (m.userYes > 0n || m.userNo > 0n) ? "block" : "none";
-
-    document.getElementById("btnYes").disabled = expired;
-    document.getElementById("btnNo").disabled = expired;
-  } catch(e) {
-    log("statusLog", "Error: " + e.message, "err");
+  document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+  
+  if (tab === "active") {
+    document.getElementById("activeTab").classList.add("active");
+    document.querySelector('[onclick="switchTab(\'active\')"]').classList.add("active");
+    document.getElementById("marketCard").style.display = "none";
+    document.getElementById("backBtn").style.display = "none";
+  } else {
+    document.getElementById("historyTab").classList.add("active");
+    document.querySelector('[onclick="switchTab(\'history\')"]').classList.add("active");
+    document.getElementById("marketCard").style.display = "none";
+    document.getElementById("backBtn").style.display = "none";
   }
 }
 
-function startCountdown(deadline, phase) {
-  clearInterval(countdownTimer);
-  const el = document.getElementById("countdown");
-  if (phase !== 0) { el.textContent = "—"; return; }
-
-  function tick() {
-    const remaining = deadline - Math.floor(Date.now() / 1000);
-    if (remaining <= 0) {
-      el.textContent = "Betting closed";
-      clearInterval(countdownTimer);
-      return;
-    }
-    const m = Math.floor(remaining / 60);
-    const s = remaining % 60;
-    el.textContent = `${m}m ${String(s).padStart(2,"0")}s`;
-  }
-  tick();
-  countdownTimer = setInterval(tick, 1000);
-}
-
-async function placeBet(isYes) {
-  if (!signer) { alert("Connect wallet first"); return; }
-  const amtStr = document.getElementById("betAmount").value;
-  const amt = parseFloat(amtStr);
-  if (!amt || amt <= 0) { alert("Enter valid amount"); return; }
-
-  const btn = isYes ? document.getElementById("btnYes") : document.getElementById("btnNo");
-  btn.disabled = true;
-
-  try {
-    log("statusLog", `Sending ${isYes ? "YES" : "NO"} bet of ${amt} ETH...`, "info");
-    const c = contract.connect(signer);
-    const fn = isYes ? c.placeYes : c.placeNo;
-    const tx = await fn(selectedMarketId, { value: ethers.parseEther(amtStr) });
-    log("statusLog", `TX: ${tx.hash.slice(0,18)}...`, "info");
-    await tx.wait();
-    log("statusLog", `✓ Bet confirmed!`, "ok");
-    await loadAllMarkets();
-    updateUI();
-    document.getElementById("betAmount").value = "";
-  } catch(e) {
-    log("statusLog", "Failed: " + (e.reason || e.message), "err");
-  }
-  btn.disabled = false;
-}
-
-async function claimWinnings() {
-  if (!signer) { alert("Connect wallet first"); return; }
-  try {
-    log("statusLog", "Claiming winnings...", "info");
-    const tx = await contract.connect(signer).claim(selectedMarketId);
-    log("statusLog", `TX: ${tx.hash.slice(0,18)}...`, "info");
-    await tx.wait();
-    log("statusLog", "✓ Winnings claimed!", "ok");
-    await loadAllMarkets();
-    updateUI();
-  } catch(e) {
-    log("statusLog", "Failed: " + (e.reason || e.message), "err");
-  }
-}
-
-function log(targetId, msg, type = "") {
-  const el = document.getElementById(targetId);
-  if (!el) return;
+function log(msg, type) {
+  const el = document.getElementById("statusLog");
   const line = document.createElement("div");
-  if (type) line.classList.add(type);
+  line.className = type;
   line.innerHTML = msg;
   el.appendChild(line);
   el.scrollTop = el.scrollHeight;
+  console.log(msg);
 }
+
+log("Enter contract address above and click Load Markets", "info");
 </script>
 
 </body>
