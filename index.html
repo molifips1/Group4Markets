@@ -2,110 +2,118 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Group4Market — Global History</title>
+<title>Group4Market — Live Factory</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
   :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px; }
-  header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-  .logo { font-family: 'Space Mono', monospace; font-size: 3rem; font-weight: 700; color: var(--accent); letter-spacing: -3px; }
-  .status-pill { background: #000; padding: 10px 20px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; border: 1px solid var(--border); display: inline-block; margin-bottom: 20px; color: var(--accent); }
+  
+  header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
+  .logo { font-family: 'Space Mono', monospace; font-size: 2.5rem; font-weight: 700; color: var(--accent); letter-spacing: -2px; margin: 0; }
+  
+  .market-stats { background: #000; border: 1px solid var(--border); padding: 12px 20px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.85rem; color: var(--accent); margin-bottom: 30px; display: inline-block; }
+  
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 25px; position: relative; border-top: 5px solid var(--accent); }
-  .question { font-size: 1.3rem; font-weight: 700; margin: 15px 0; min-height: 3rem; }
-  .stat-box { background: #000; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); flex: 1; }
-  .btn-connect { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-family: 'Space Mono'; cursor: pointer; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 25px; border-top: 6px solid var(--accent); transition: 0.3s; }
+  .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+  
+  .id-badge { font-family: 'Space Mono'; font-size: 0.7rem; color: #6b7080; text-transform: uppercase; margin-bottom: 10px; }
+  .question { font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; min-height: 3.5rem; line-height: 1.2; }
+  
+  .pools { display: flex; gap: 12px; margin-bottom: 20px; }
+  .pool-box { flex: 1; background: #000; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
+  .pool-box small { font-size: 0.65rem; color: #6b7080; display: block; margin-bottom: 4px; }
+  .pool-box b { font-family: 'Space Mono'; font-size: 1.1rem; }
+
+  .btn-bet { width: 100%; padding: 12px; border: none; border-radius: 8px; font-family: 'Space Mono'; font-weight: 700; cursor: pointer; margin-top: 8px; transition: 0.2s; }
+  .btn-yes { background: var(--yes); color: #003b26; }
+  .btn-no { background: var(--no); color: white; }
+  input { width: 100%; background: #000; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Space Mono'; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Group4Market</div>
-  <button id="connect-btn" class="btn-connect" onclick="connect()">Connect Wallet</button>
+  <h1 class="logo">Group4Market</h1>
+  <div id="status-pill" class="market-stats">Connecting to Sepolia...</div>
 </header>
 
-<div id="scan-status" class="status-pill">📡 Initializing Blockchain Scan...</div>
-<div id="master-grid" class="grid"></div>
+<div id="market-grid" class="grid"></div>
 
 <script>
-// CONFIG
-const DEPLOYER = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
-const RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
+// YOUR PERMANENT CONTRACT SETTINGS
+const CONTRACT_ADDRESS = "0x2e5E1c6B47C34Ff2718E357A4009e03bF8aD1ec0";
+const RPC_URL = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
 const ABI = [
-    "function marketCount() view returns (uint256)",
-    "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes, address yesAuditor, address noAuditor, address finalDecider, uint256 deciderFee, uint256 potAtSettle)"
+  "function marketCount() view returns (uint256)",
+  "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes, address yesAuditor, address noAuditor, address finalDecider, uint256 deciderFee, uint256 potAtSettle)",
+  "function placeYes(uint256) payable",
+  "function placeNo(uint256) payable"
 ];
 
-let provider;
+let provider, signer;
 
 window.onload = async () => {
-    provider = new ethers.JsonRpcProvider(RPC);
-    loadGlobalHistory();
+    provider = new ethers.JsonRpcProvider(RPC_URL);
+    loadMarkets();
 };
 
-async function loadGlobalHistory() {
-    const status = document.getElementById('scan-status');
-    const grid = document.getElementById('master-grid');
+async function loadMarkets() {
+    const grid = document.getElementById('market-grid');
+    const status = document.getElementById('status-pill');
     
     try {
-        // 1. Fetch TX list from Etherscan
-        const apiUrl = `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER}&sort=desc&apikey=FREE_TOKEN`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+        const count = await contract.marketCount();
+        
+        status.innerText = `📡 Factory Active: ${count} Markets Found`;
+        grid.innerHTML = "";
 
-        // Check for Rate Limiting
-        if (data.status === "0" && data.message === "NOTOK") {
-            status.innerText = "⏳ Etherscan is busy. Retrying in 5s...";
-            setTimeout(loadGlobalHistory, 5000);
-            return;
+        // Loop through all markets in this single contract
+        for (let i = 0; i < Number(count); i++) {
+            const m = await contract.getMarket(i);
+            const card = document.createElement('div');
+            card.className = "card";
+            card.innerHTML = `
+                <div class="id-badge">Market #${i}</div>
+                <div class="question">${m[0]}</div>
+                <div class="pools">
+                    <div class="pool-box"><small>YES POOL</small><b style="color:var(--yes)">${ethers.formatEther(m[4])}</b></div>
+                    <div class="pool-box"><small>NO POOL</small><b style="color:var(--no)">${ethers.formatEther(m[5])}</b></div>
+                </div>
+                <input type="number" step="0.01" placeholder="Amount (ETH)" id="bet-${i}">
+                <button class="btn-bet btn-yes" onclick="bet(${i}, true)">VOTE YES</button>
+                <button class="btn-bet btn-no" onclick="bet(${i}, false)">VOTE NO</button>
+            `;
+            grid.appendChild(card);
         }
-
-        // 2. Filter for unique contract deployments
-        const contracts = [...new Set(data.result
-            .filter(tx => tx.to === "" || (tx.contractAddress && tx.contractAddress !== ""))
-            .map(tx => tx.contractAddress || tx.to)
-        )];
-
-        status.innerText = `🔍 Found ${contracts.length} deployments. Checking for markets...`;
-
-        for (const addr of contracts) {
-            try {
-                const contract = new ethers.Contract(addr, ABI, provider);
-                const count = await contract.marketCount();
-                
-                for (let i = 0; i < Number(count); i++) {
-                    const m = await contract.getMarket(i);
-                    const card = document.createElement('div');
-                    card.className = "card";
-                    card.innerHTML = `
-                        <div style="font-family: 'Space Mono'; font-size: 0.7rem; color: #6b7080;">Contract: ${addr.slice(0,10)}...</div>
-                        <div class="question">${m[0]}</div>
-                        <div style="display:flex; gap:10px;">
-                            <div class="stat-box"><small>YES</small><br><b style="color:var(--yes)">${ethers.formatEther(m[4])}</b></div>
-                            <div class="stat-box"><small>NO</small><br><b style="color:var(--no)">${ethers.formatEther(m[5])}</b></div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                }
-                // Pause to avoid hitting Infura/Etherscan limits
-                await new Promise(r => setTimeout(r, 200));
-            } catch (e) {
-                // Not a market contract, skip quietly
-            }
-        }
-        status.innerText = `✅ Loaded ${grid.children.length} total markets.`;
     } catch (err) {
-        status.innerText = "❌ Scan failed. Please check console for errors.";
+        status.innerText = "❌ Error: Could not reach contract.";
         console.error(err);
     }
 }
 
-async function connect() {
-    if (!window.ethereum) return alert("Install MetaMask");
+async function bet(id, isYes) {
+    if (!window.ethereum) return alert("Please install MetaMask");
     const browserProvider = new ethers.BrowserProvider(window.ethereum);
-    await browserProvider.getSigner();
-    document.getElementById('connect-btn').innerText = "Wallet Linked";
+    const signer = await browserProvider.getSigner();
+    const userContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+    
+    const amount = document.getElementById(`bet-${id}`).value;
+    if (!amount || amount <= 0) return alert("Enter a valid ETH amount");
+
+    try {
+        const tx = isYes ? 
+            await userContract.placeYes(id, { value: ethers.parseEther(amount) }) : 
+            await userContract.placeNo(id, { value: ethers.parseEther(amount) });
+        
+        document.getElementById('status-pill').innerText = "⏳ Transaction Pending...";
+        await tx.wait();
+        loadMarkets(); // Refresh data
+    } catch (err) {
+        alert("Transaction failed: " + (err.reason || err.message));
+    }
 }
 </script>
 </body>
