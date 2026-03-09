@@ -3,141 +3,121 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Group4Market — Live Dashboard</title>
+<title>Group4Market — Global History</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
-  
-  :root { 
-    --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; 
-    --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; --muted: #6b7080;
-  }
-
+  :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; --muted: #6b7080; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
   
-  header { 
-    position: sticky; top: 0; background: rgba(10,11,15,0.95); backdrop-filter: blur(15px); 
-    border-bottom: 1px solid var(--border); padding: 2.5rem 4rem; 
-    display: flex; justify-content: space-between; align-items: center; z-index: 100; 
-  }
-  .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); font-size: 4.5rem; letter-spacing: -5px; line-height: 0.8; margin: 0; }
-  .network-tag { font-family: 'Space Mono', monospace; font-size: 1.1rem; color: #ff9f43; text-transform: uppercase; margin-top: 10px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-  .dot { width: 12px; height: 12px; background: #ff9f43; border-radius: 50%; box-shadow: 0 0 15px #ff9f43; animation: pulse 2s infinite; }
-  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
+  header { position: sticky; top: 0; background: rgba(10,11,15,0.95); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+  .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); font-size: 3.5rem; letter-spacing: -4px; line-height: 0.8; margin: 0; }
+  
   .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+  .status-bar { background: #000; padding: 15px 25px; border-radius: 12px; font-family: 'Space Mono'; font-size: 0.8rem; color: var(--muted); margin-bottom: 2rem; border-left: 5px solid var(--accent); }
   
-  .discovery-status { background: #000; padding: 20px 30px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center; border-left: 8px solid var(--accent); }
-  .status-info { font-family: 'Space Mono'; font-size: 0.85rem; }
-  .status-label { color: var(--muted); text-transform: uppercase; font-size: 0.7rem; margin-bottom: 4px; display: block; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 2rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; transition: 0.3s; position: relative; }
+  .card:hover { border-color: var(--accent); transform: translateY(-5px); }
   
-  .category-header { font-size: 2.2rem; font-weight: 700; margin: 4rem 0 1.5rem; display: flex; align-items: center; gap: 20px; }
-  .count-pill { background: var(--surface); border: 1px solid var(--border); font-size: 1.1rem; padding: 5px 20px; border-radius: 40px; color: var(--accent); font-family: 'Space Mono'; }
-
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 2.5rem; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 2.5rem; transition: 0.4s; position: relative; border-top: 8px solid var(--muted); }
-  .card.open { border-top-color: var(--yes); }
+  .contract-tag { position: absolute; top: -10px; right: 20px; background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-family: 'Space Mono'; }
+  .question { font-size: 1.4rem; font-weight: 700; margin-top: 10px; margin-bottom: 1.5rem; line-height: 1.3; }
   
-  .question { font-size: 1.8rem; font-weight: 700; margin-bottom: 2rem; line-height: 1.2; min-height: 4.5rem; }
-  .pool { flex: 1; background: var(--bg); padding: 18px; border-radius: 16px; border: 1px solid var(--border); text-align: center; margin-bottom: 1rem; }
-  .pool small { color: var(--muted); text-transform: uppercase; font-size: 0.7rem; font-family: 'Space Mono'; }
-  .pool div { font-family: 'Space Mono'; font-weight: 700; font-size: 1.4rem; margin-top: 8px; }
-
-  .btn { width: 100%; padding: 18px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Space Mono'; font-size: 1rem; transition: 0.2s; }
-  .btn-connect { width: auto; background: var(--accent); color: white; padding: 12px 35px; border-radius: 50px; font-size: 1.1rem; }
-  .btn-yes { background: var(--yes); color: #003b26; margin-bottom: 12px; }
+  .pool-stats { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+  .pool { flex: 1; background: var(--bg); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
+  .pool b { display: block; font-size: 1.1rem; font-family: 'Space Mono'; }
+  
+  .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Space Mono'; margin-top: 5px; }
+  .btn-yes { background: var(--yes); color: #003b26; }
   .btn-no { background: var(--no); color: white; }
-  input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 16px; width: 100%; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-family: 'Space Mono'; font-size: 1.1rem; }
+  .btn-connect { width: auto; background: var(--accent); color: white; padding: 10px 25px; }
+  
+  input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Space Mono'; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-container">
-    <h1 class="logo">Group4Market</h1>
-    <div class="network-tag"><span class="dot"></span> Sepolia Testnet</div>
-  </div>
-  <button id="connect-btn" class="btn btn-connect" onclick="connect()">Connect MetaMask</button>
+  <div class="logo">Group4Market</div>
+  <button id="connect-btn" class="btn btn-connect" onclick="connect()">Connect Wallet</button>
 </header>
 
 <main class="main">
-  <div class="discovery-status">
-    <div class="status-info">
-      <span class="status-label">Tracking Deployer</span>
-      <span id="deployer-display">0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4</span>
-    </div>
-    <div class="status-info">
-      <span class="status-label">Active Contract (Auto-Detected)</span>
-      <span id="active-contract" style="color:var(--accent); font-weight:bold;">Finding...</span>
-    </div>
-  </div>
-
-  <div class="category-header">🟢 ACTIVE MARKETS <span class="count-pill" id="count-open">0</span></div>
-  <div id="grid-open" class="grid"></div>
+  <div class="status-bar" id="load-status">🔍 Scanning all historical deployments for 0xb215...</div>
+  
+  <div id="master-grid" class="grid"></div>
 </main>
 
 <script>
-const RPC_URL = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
-const DEPLOYER_WALLET = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
-
+const DEPLOYER = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
+const RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
 const ABI = [
   "function marketCount() view returns (uint256)",
-  "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes, address yesAuditor, address noAuditor, address finalDecider, uint256 deciderFee, uint256 potAtSettle)",
-  "function placeYes(uint256) payable",
-  "function placeNo(uint256) payable"
+  "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved)"
 ];
 
-let provider, signer, activeContractAddr;
+let provider, signer;
 
 window.onload = async () => {
-    provider = new ethers.JsonRpcProvider(RPC_URL);
-    await autoDetectLatestContract();
+    provider = new ethers.JsonRpcProvider(RPC);
+    await scanAllContracts();
 };
 
-async function autoDetectLatestContract() {
+async function scanAllContracts() {
+    const status = document.getElementById('load-status');
+    const grid = document.getElementById('master-grid');
+    grid.innerHTML = "";
+
     try {
-        // Find the last "Contract Creation" by YOUR wallet
-        const url = `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER_WALLET}&sort=desc&apikey=FREE_TOKEN`;
-        const res = await fetch(url);
+        // 1. Get ALL transactions from the deployer
+        const res = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER}&sort=desc&apikey=FREE_TOKEN`);
         const data = await res.json();
         
-        // Find the most recent transaction with no 'to' (Contract Creation)
-        const latestTx = data.result.find(tx => tx.to === "" || (tx.contractAddress && tx.contractAddress !== ""));
-        
-        if (latestTx) {
-            activeContractAddr = latestTx.contractAddress || latestTx.to;
-            document.getElementById('active-contract').innerText = activeContractAddr;
-            await syncAllMarkets();
+        // 2. Filter for transactions that created contracts
+        const contractAddresses = [...new Set(data.result
+            .filter(tx => tx.to === "" || (tx.contractAddress && tx.contractAddress !== ""))
+            .map(tx => tx.contractAddress || tx.to)
+        )];
+
+        status.innerText = `Found ${contractAddresses.length} historical contracts. Loading all markets...`;
+
+        // 3. Loop through every contract ever made
+        for (const addr of contractAddresses) {
+            try {
+                const contract = new ethers.Contract(addr, ABI, provider);
+                const count = await contract.marketCount();
+                
+                for (let i = 0; i < Number(count); i++) {
+                    const m = await contract.getMarket(i);
+                    renderMarket(addr, i, m);
+                }
+            } catch (e) {
+                console.log(`Contract at ${addr} is not a Market contract or is too old.`);
+            }
         }
+        status.innerText = `✅ Loaded all historical markets from ${contractAddresses.length} deployments.`;
     } catch (e) {
-        console.error("Discovery error:", e);
+        status.innerText = "❌ History scan failed. Check your internet connection.";
     }
 }
 
-async function syncAllMarkets() {
-    const gridOpen = document.getElementById('grid-open');
-    const contract = new ethers.Contract(activeContractAddr, ABI, provider);
-    try {
-        const total = await contract.marketCount();
-        gridOpen.innerHTML = "";
-        for (let i = 0; i < Number(total); i++) {
-            const m = await contract.getMarket(i);
-            const card = document.createElement('div');
-            card.className = 'card open';
-            card.innerHTML = `
-                <div class="question">${m[0]}</div>
-                <div style="display:flex; gap:10px;">
-                    <div class="pool"><small>YES</small><div style="color:var(--yes)">${ethers.formatEther(m[4])} ETH</div></div>
-                    <div class="pool"><small>NO</small><div style="color:var(--no)">${ethers.formatEther(m[5])} ETH</div></div>
-                </div>
-                <input type="number" step="0.001" placeholder="Amount (ETH)" id="in-${i}">
-                <button class="btn btn-yes" onclick="bet(${i}, true)">Bet YES</button>
-                <button class="btn btn-no" onclick="bet(${i}, false)">Bet NO</button>
-            `;
-            gridOpen.appendChild(card);
-        }
-        document.getElementById('count-open').innerText = total;
-    } catch (e) { console.error(e); }
+function renderMarket(contractAddr, id, m) {
+    const grid = document.getElementById('master-grid');
+    const card = document.createElement('div');
+    card.className = "card";
+    card.innerHTML = `
+        <div class="contract-tag">Contract: ${contractAddr.slice(0,6)}...</div>
+        <div style="font-family:'Space Mono'; font-size:0.7rem; color:var(--muted);">MARKET #${id}</div>
+        <div class="question">${m[0]}</div>
+        <div class="pool-stats">
+            <div class="pool"><small>YES</small><b style="color:var(--yes)">${ethers.formatEther(m[4])}</b></div>
+            <div class="pool"><small>NO</small><b style="color:var(--no)">${ethers.formatEther(m[5])}</b></div>
+        </div>
+        <input type="number" step="0.01" placeholder="ETH Amount" id="in-${contractAddr}-${id}">
+        <button class="btn btn-yes" onclick="bet('${contractAddr}', ${id}, true)">Bet YES</button>
+        <button class="btn btn-no" onclick="bet('${contractAddr}', ${id}, false)">Bet NO</button>
+    `;
+    grid.appendChild(card);
 }
 
 async function connect() {
@@ -145,17 +125,19 @@ async function connect() {
     const browserProvider = new ethers.BrowserProvider(window.ethereum);
     signer = await browserProvider.getSigner();
     document.getElementById('connect-btn').innerText = "Connected";
-    await syncAllMarkets();
 }
 
-async function bet(id, isYes) {
+async function bet(contractAddr, id, isYes) {
     if (!signer) return connect();
-    const val = document.getElementById(`in-${id}`).value;
-    const userContract = new ethers.Contract(activeContractAddr, ABI, signer);
+    const val = document.getElementById(`in-${contractAddr}-${id}`).value;
+    const betABI = ["function placeYes(uint256) payable", "function placeNo(uint256) payable"];
+    const userContract = new ethers.Contract(contractAddr, betABI, signer);
     try {
-        const tx = isYes ? await userContract.placeYes(id, {value: ethers.parseEther(val)}) : await userContract.placeNo(id, {value: ethers.parseEther(val)});
+        const tx = isYes ? 
+            await userContract.placeYes(id, {value: ethers.parseEther(val)}) : 
+            await userContract.placeNo(id, {value: ethers.parseEther(val)});
         await tx.wait();
-        await syncAllMarkets();
+        location.reload(); 
     } catch (e) { alert(e.message); }
 }
 </script>
