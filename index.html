@@ -2,24 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Group4Market — Play & Win</title>
+<title>Group4Market — Analytics Hub</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono&family=DM+Sans:wght@400;700&display=swap');
   :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px; }
+  
   header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
   .logo { font-family: 'Space Mono', monospace; font-size: 2rem; font-weight: 700; color: var(--accent); }
-  .status-bar { background: #000; border: 1px solid var(--border); padding: 15px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; margin-bottom: 30px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 25px; border-top: 6px solid var(--accent); }
-  .question { font-size: 1.4rem; font-weight: 700; margin-bottom: 15px; }
-  .pool-box { flex: 1; background: #000; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
+  
+  h2 { font-family: 'Space Mono'; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin: 40px 0 20px; border-left: 4px solid var(--accent); padding-left: 15px; }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 25px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 25px; transition: 0.3s; }
+  
+  /* Visual Graph */
+  .graph-container { height: 12px; background: #000; border-radius: 6px; overflow: hidden; display: flex; margin: 20px 0; border: 1px solid var(--border); }
+  .bar-yes { height: 100%; background: var(--yes); transition: width 0.5s; }
+  .bar-no { height: 100%; background: var(--no); transition: width 0.5s; }
+  
+  .timer { font-family: 'Space Mono'; font-size: 0.85rem; color: #ff9f43; background: rgba(255, 159, 67, 0.1); padding: 5px 10px; border-radius: 5px; display: inline-block; margin-bottom: 10px; }
+  .pool-labels { display: flex; justify-content: space-between; font-family: 'Space Mono'; font-size: 0.75rem; margin-bottom: 5px; }
+  
   input { width: 100%; background: #000; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Space Mono'; }
-  button { cursor: pointer; font-family: 'Space Mono'; font-weight: 700; border-radius: 8px; border: none; width: 100%; padding: 12px; margin-top: 5px; transition: 0.2s; }
+  button { cursor: pointer; font-family: 'Space Mono'; font-weight: 700; border-radius: 8px; border: none; width: 100%; padding: 12px; margin-top: 5px; }
   .btn-yes { background: var(--yes); color: #003b26; }
   .btn-no { background: var(--no); color: white; }
-  .btn-withdraw { background: #ff9f43; color: black; margin-top: 15px; }
+  .btn-withdraw { background: var(--accent); color: white; margin-top: 15px; }
   .btn-connect { background: var(--accent); color: white; width: auto; padding: 10px 20px; }
 </style>
 </head>
@@ -30,13 +40,21 @@
   <button id="connect-btn" class="btn-connect" onclick="connectWallet()">Connect MetaMask</button>
 </header>
 
-<div id="debug-status" class="status-bar">🔌 Link MetaMask to start betting...</div>
-<div id="market-grid" class="grid"></div>
+<div id="status" style="font-family:'Space Mono'; font-size:0.8rem; color:#6b7080;">Status: Awaiting connection...</div>
+
+<section>
+  <h2>🟢 Active Markets</h2>
+  <div id="active-grid" class="grid"></div>
+</section>
+
+<section>
+  <h2>🔴 Closed & Resolved</h2>
+  <div id="closed-grid" class="grid"></div>
+</section>
 
 <script>
 const CONTRACT_ADDR = "0x2e5E1c6B47C34Ff2718E357A4009e03bF8aD1ec0";
 const INFURA_RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
-
 const ABI = [
   "function marketCount() view returns (uint256)",
   "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes)",
@@ -50,74 +68,112 @@ let provider, signer, contractRead;
 async function init() {
     provider = new ethers.JsonRpcProvider(INFURA_RPC);
     contractRead = new ethers.Contract(CONTRACT_ADDR, ABI, provider);
-    loadMarkets();
+    await loadMarkets();
+    setInterval(updateTimers, 1000); // Ticks every second
 }
 
 async function connectWallet() {
-    if (!window.ethereum) return alert("Install MetaMask!");
+    if (!window.ethereum) return alert("Install MetaMask");
     const browserProvider = new ethers.BrowserProvider(window.ethereum);
     signer = await browserProvider.getSigner();
     document.getElementById('connect-btn').innerText = "Connected ✅";
-    document.getElementById('debug-status').innerText = "✅ Wallet Linked. Ready to bet.";
+    loadMarkets();
 }
 
 async function loadMarkets() {
-    const grid = document.getElementById('market-grid');
+    const activeGrid = document.getElementById('active-grid');
+    const closedGrid = document.getElementById('closed-grid');
+    
     try {
         const count = await contractRead.marketCount();
-        grid.innerHTML = "";
+        activeGrid.innerHTML = "";
+        closedGrid.innerHTML = "";
+
         for (let i = 0; i < Number(count); i++) {
             const m = await contractRead.getMarket(i);
-            const isResolved = m[6];
-            
-            grid.innerHTML += `
+            const question = m[0];
+            const deadline = Number(m[2]);
+            const yesPool = parseFloat(ethers.formatEther(m[4]));
+            const noPool = parseFloat(ethers.formatEther(m[5]));
+            const resolved = m[6];
+            const outcome = m[7];
+
+            // Calculate Percentages for Graph
+            const total = yesPool + noPool;
+            const yesPct = total > 0 ? (yesPool / total) * 100 : 50;
+            const noPct = total > 0 ? (noPool / total) * 100 : 50;
+
+            const cardHTML = `
                 <div class="card">
-                    <div style="font-family:'Space Mono'; font-size:0.7rem; color:#6b7080;">#${i} ${isResolved ? '✅ RESOLVED' : '⏳ ACTIVE'}</div>
-                    <div class="question">${m[0]}</div>
-                    <div style="display:flex; gap:10px; margin-bottom:15px;">
-                        <div class="pool-box"><small>YES</small><br><b>${ethers.formatEther(m[4])} ETH</b></div>
-                        <div class="pool-box"><small>NO</small><br><b>${ethers.formatEther(m[5])} ETH</b></div>
-                    </div>
+                    ${!resolved ? `<div class="timer" data-deadline="${deadline}">Calculating time...</div>` : ''}
+                    <div style="font-family:'Space Mono'; font-size:0.7rem; color:#6b7080;">ID #${i}</div>
+                    <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;">${question}</div>
                     
-                    ${!isResolved ? `
-                        <input type="number" step="0.01" placeholder="Amount (ETH)" id="val-${i}">
-                        <button class="btn-yes" onclick="action(${i}, 'yes')">BET YES</button>
-                        <button class="btn-no" onclick="action(${i}, 'no')">BET NO</button>
+                    <div class="pool-labels">
+                        <span style="color:var(--yes)">YES: ${yesPool.toFixed(3)} ETH</span>
+                        <span style="color:var(--no)">NO: ${noPool.toFixed(3)} ETH</span>
+                    </div>
+                    <div class="graph-container">
+                        <div class="bar-yes" style="width: ${yesPct}%"></div>
+                        <div class="bar-no" style="width: ${noPct}%"></div>
+                    </div>
+
+                    ${!resolved ? `
+                        <input type="number" step="0.01" placeholder="ETH Amount" id="val-${i}">
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-yes" onclick="action(${i}, 'yes')">VOTE YES</button>
+                            <button class="btn-no" onclick="action(${i}, 'no')">VOTE NO</button>
+                        </div>
                     ` : `
-                        <div style="text-align:center; padding:10px; background:#000; border-radius:8px; color:var(--accent)">
-                            Winner: ${m[7] ? 'YES' : 'NO'}
+                        <div style="text-align:center; padding:15px; background:rgba(124,108,255,0.1); border-radius:8px; color:var(--accent); font-weight:bold;">
+                            WINNER: ${outcome ? 'YES' : 'NO'}
                         </div>
                         <button class="btn-withdraw" onclick="action(${i}, 'withdraw')">CLAIM WINNINGS</button>
                     `}
                 </div>`;
+
+            if (resolved) closedGrid.innerHTML += cardHTML;
+            else activeGrid.innerHTML += cardHTML;
         }
     } catch (e) { console.error(e); }
 }
 
-async function action(id, type) {
-    if (!signer) return alert("Please click 'Connect MetaMask' first!");
-    const contractWrite = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
-    const status = document.getElementById('debug-status');
+function updateTimers() {
+    const timers = document.querySelectorAll('.timer');
+    timers.forEach(t => {
+        const deadline = parseInt(t.getAttribute('data-deadline'));
+        const now = Math.floor(Date.now() / 1000);
+        const diff = deadline - now;
 
+        if (diff <= 0) {
+            t.innerText = "⌛ Voting Ended (Awaiting Result)";
+            t.style.color = "#6b7080";
+        } else {
+            const h = Math.floor(diff / 3600);
+            const m = Math.floor((diff % 3600) / 60);
+            const s = diff % 60;
+            t.innerText = `⏳ Closes in: ${h}h ${m}m ${s}s`;
+        }
+    });
+}
+
+async function action(id, type) {
+    if (!signer) return alert("Connect MetaMask first!");
+    const contractWrite = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
     try {
         let tx;
         if (type === 'withdraw') {
             tx = await contractWrite.withdrawWinnings(id);
         } else {
             const val = document.getElementById(`val-${id}`).value;
-            if (!val || val <= 0) return alert("Enter ETH amount");
-            const options = { value: ethers.parseEther(val) };
-            tx = (type === 'yes') ? await contractWrite.placeYes(id, options) : await contractWrite.placeNo(id, options);
+            if (!val || val <= 0) return alert("Enter ETH");
+            tx = type === 'yes' ? 
+                await contractWrite.placeYes(id, {value: ethers.parseEther(val)}) : 
+                await contractWrite.placeNo(id, {value: ethers.parseEther(val)});
         }
-
-        status.innerText = "⏳ Transaction pending... check MetaMask.";
         await tx.wait();
-        status.innerText = "✅ Transaction Confirmed!";
         loadMarkets();
-    } catch (e) {
-        alert("Error: " + (e.reason || e.message));
-        status.innerText = "❌ Transaction failed.";
-    }
+    } catch (e) { alert(e.reason || e.message); }
 }
 
 window.onload = init;
