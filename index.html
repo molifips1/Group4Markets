@@ -1,182 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Group4Market — Analytics Hub</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono&family=DM+Sans:wght@400;700&display=swap');
-  :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px; }
-  
-  header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
-  .logo { font-family: 'Space Mono', monospace; font-size: 2rem; font-weight: 700; color: var(--accent); }
-  
-  h2 { font-family: 'Space Mono'; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin: 40px 0 20px; border-left: 4px solid var(--accent); padding-left: 15px; }
-  
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 25px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 25px; transition: 0.3s; }
-  
-  /* Visual Graph */
-  .graph-container { height: 12px; background: #000; border-radius: 6px; overflow: hidden; display: flex; margin: 20px 0; border: 1px solid var(--border); }
-  .bar-yes { height: 100%; background: var(--yes); transition: width 0.5s; }
-  .bar-no { height: 100%; background: var(--no); transition: width 0.5s; }
-  
-  .timer { font-family: 'Space Mono'; font-size: 0.85rem; color: #ff9f43; background: rgba(255, 159, 67, 0.1); padding: 5px 10px; border-radius: 5px; display: inline-block; margin-bottom: 10px; }
-  .pool-labels { display: flex; justify-content: space-between; font-family: 'Space Mono'; font-size: 0.75rem; margin-bottom: 5px; }
-  
-  input { width: 100%; background: #000; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Space Mono'; }
-  button { cursor: pointer; font-family: 'Space Mono'; font-weight: 700; border-radius: 8px; border: none; width: 100%; padding: 12px; margin-top: 5px; }
-  .btn-yes { background: var(--yes); color: #003b26; }
-  .btn-no { background: var(--no); color: white; }
-  .btn-withdraw { background: var(--accent); color: white; margin-top: 15px; }
-  .btn-connect { background: var(--accent); color: white; width: auto; padding: 10px 20px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group4Market — Professional Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&family=DM+Sans:wght@400;700&display=swap');
+        
+        :root {
+            --bg: #0a0b0f;
+            --surface: #111318;
+            --border: #1e2029;
+            --text: #e8eaf0;
+            --accent: #7c6cff;
+            --yes: #00d98b;
+            --no: #ff4d6d;
+            --warning: #ff9f43;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .status-bar {
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Space Mono';
+            font-size: 0.8rem;
+            margin-bottom: 30px;
+            color: var(--warning);
+        }
+
+        h2 {
+            font-family: 'Space Mono';
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin: 40px 0 20px;
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .timer {
+            font-family: 'Space Mono';
+            font-size: 0.8rem;
+            color: var(--warning);
+            background: rgba(255, 159, 67, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .question {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        /* Betting Graph */
+        .graph-wrap {
+            height: 12px;
+            background: #000;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            margin: 15px 0;
+            border: 1px solid var(--border);
+        }
+        .bar-yes { background: var(--yes); height: 100%; transition: 0.5s; }
+        .bar-no { background: var(--no); height: 100%; transition: 0.5s; }
+
+        .pool-text {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Mono';
+            font-size: 0.8rem;
+        }
+
+        input {
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: 'Space Mono';
+            box-sizing: border-box;
+        }
+
+        .btn-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: 'Space Mono';
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            padding: 12px;
+            transition: 0.2s;
+        }
+
+        .btn-yes { background: var(--yes); color: #003b26; flex: 1; }
+        .btn-no { background: var(--no); color: white; flex: 1; }
+        .btn-claim { background: var(--accent); color: white; width: 100%; margin-top: 15px; }
+        .btn-connect { background: var(--accent); color: white; width: auto; padding: 10px 20px; }
+
+        .debug-line {
+            font-size: 0.6rem;
+            color: #6b7080;
+            margin-top: 15px;
+            border-top: 1px dashed #333;
+            padding-top: 10px;
+            font-family: 'Space Mono';
+        }
+    </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Group4Market</div>
-  <button id="connect-btn" class="btn-connect" onclick="connectWallet()">Connect MetaMask</button>
+    <div class="logo">Group4Market</div>
+    <button id="connect-btn" class="btn-connect" onclick="connectWallet()">Connect MetaMask</button>
 </header>
 
-<div id="status" style="font-family:'Space Mono'; font-size:0.8rem; color:#6b7080;">Status: Awaiting connection...</div>
+<div id="status" class="status-bar">🔌 Please link your MetaMask to see markets and place bets.</div>
 
 <section>
-  <h2>🟢 Active Markets</h2>
-  <div id="active-grid" class="grid"></div>
+    <h2>🟢 Active Markets</h2>
+    <div id="active-grid" class="grid"></div>
 </section>
 
 <section>
-  <h2>🔴 Closed & Resolved</h2>
-  <div id="closed-grid" class="grid"></div>
+    <h2>🔴 Closed & Resolved</h2>
+    <div id="closed-grid" class="grid"></div>
 </section>
 
 <script>
-const CONTRACT_ADDR = "0x2e5E1c6B47C34Ff2718E357A4009e03bF8aD1ec0";
-const INFURA_RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
-const ABI = [
-  "function marketCount() view returns (uint256)",
-  "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes)",
-  "function placeYes(uint256) payable",
-  "function placeNo(uint256) payable",
-  "function withdrawWinnings(uint256)"
-];
-
-let provider, signer, contractRead;
-
-async function init() {
-    provider = new ethers.JsonRpcProvider(INFURA_RPC);
-    contractRead = new ethers.Contract(CONTRACT_ADDR, ABI, provider);
-    await loadMarkets();
-    setInterval(updateTimers, 1000); // Ticks every second
-}
-
-async function connectWallet() {
-    if (!window.ethereum) return alert("Install MetaMask");
-    const browserProvider = new ethers.BrowserProvider(window.ethereum);
-    signer = await browserProvider.getSigner();
-    document.getElementById('connect-btn').innerText = "Connected ✅";
-    loadMarkets();
-}
-
-async function loadMarkets() {
-    const activeGrid = document.getElementById('active-grid');
-    const closedGrid = document.getElementById('closed-grid');
+    const CONTRACT_ADDR = "0x2e5E1c6B47C34Ff2718E357A4009e03bF8aD1ec0";
+    const INFURA_RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
     
-    try {
-        const count = await contractRead.marketCount();
-        activeGrid.innerHTML = "";
-        closedGrid.innerHTML = "";
+    const ABI = [
+        "function marketCount() view returns (uint256)",
+        "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes)",
+        "function placeYes(uint256) payable",
+        "function placeNo(uint256) payable",
+        "function withdrawWinnings(uint256)"
+    ];
 
-        for (let i = 0; i < Number(count); i++) {
-            const m = await contractRead.getMarket(i);
-            const question = m[0];
-            const deadline = Number(m[2]);
-            const yesPool = parseFloat(ethers.formatEther(m[4]));
-            const noPool = parseFloat(ethers.formatEther(m[5]));
-            const resolved = m[6];
-            const outcome = m[7];
+    let provider, signer, contractRead;
 
-            // Calculate Percentages for Graph
-            const total = yesPool + noPool;
-            const yesPct = total > 0 ? (yesPool / total) * 100 : 50;
-            const noPct = total > 0 ? (noPool / total) * 100 : 50;
+    // Initialize Page
+    window.onload = async () => {
+        provider = new ethers.JsonRpcProvider(INFURA_RPC);
+        contractRead = new ethers.Contract(CONTRACT_ADDR, ABI, provider);
+        await loadMarkets();
+        setInterval(refreshTimers, 1000);
+    };
 
-            const cardHTML = `
-                <div class="card">
-                    ${!resolved ? `<div class="timer" data-deadline="${deadline}">Calculating time...</div>` : ''}
-                    <div style="font-family:'Space Mono'; font-size:0.7rem; color:#6b7080;">ID #${i}</div>
-                    <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;">${question}</div>
-                    
-                    <div class="pool-labels">
-                        <span style="color:var(--yes)">YES: ${yesPool.toFixed(3)} ETH</span>
-                        <span style="color:var(--no)">NO: ${noPool.toFixed(3)} ETH</span>
-                    </div>
-                    <div class="graph-container">
-                        <div class="bar-yes" style="width: ${yesPct}%"></div>
-                        <div class="bar-no" style="width: ${noPct}%"></div>
-                    </div>
-
-                    ${!resolved ? `
-                        <input type="number" step="0.01" placeholder="ETH Amount" id="val-${i}">
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn-yes" onclick="action(${i}, 'yes')">VOTE YES</button>
-                            <button class="btn-no" onclick="action(${i}, 'no')">VOTE NO</button>
-                        </div>
-                    ` : `
-                        <div style="text-align:center; padding:15px; background:rgba(124,108,255,0.1); border-radius:8px; color:var(--accent); font-weight:bold;">
-                            WINNER: ${outcome ? 'YES' : 'NO'}
-                        </div>
-                        <button class="btn-withdraw" onclick="action(${i}, 'withdraw')">CLAIM WINNINGS</button>
-                    `}
-                </div>`;
-
-            if (resolved) closedGrid.innerHTML += cardHTML;
-            else activeGrid.innerHTML += cardHTML;
-        }
-    } catch (e) { console.error(e); }
-}
-
-function updateTimers() {
-    const timers = document.querySelectorAll('.timer');
-    timers.forEach(t => {
-        const deadline = parseInt(t.getAttribute('data-deadline'));
-        const now = Math.floor(Date.now() / 1000);
-        const diff = deadline - now;
-
-        if (diff <= 0) {
-            t.innerText = "⌛ Voting Ended (Awaiting Result)";
-            t.style.color = "#6b7080";
-        } else {
-            const h = Math.floor(diff / 3600);
-            const m = Math.floor((diff % 3600) / 60);
-            const s = diff % 60;
-            t.innerText = `⏳ Closes in: ${h}h ${m}m ${s}s`;
-        }
-    });
-}
-
-async function action(id, type) {
-    if (!signer) return alert("Connect MetaMask first!");
-    const contractWrite = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
-    try {
-        let tx;
-        if (type === 'withdraw') {
-            tx = await contractWrite.withdrawWinnings(id);
-        } else {
-            const val = document.getElementById(`val-${id}`).value;
-            if (!val || val <= 0) return alert("Enter ETH");
-            tx = type === 'yes' ? 
-                await contractWrite.placeYes(id, {value: ethers.parseEther(val)}) : 
-                await contractWrite.placeNo(id, {value: ethers.parseEther(val)});
-        }
-        await tx.wait();
+    async function connectWallet() {
+        if (!window.ethereum) return alert("Install MetaMask");
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        signer = await browserProvider.getSigner();
+        document.getElementById('connect-btn').innerText = "Wallet Connected ✅";
+        document.getElementById('status').innerText = "✅ Connection Stable. Ready to Play.";
         loadMarkets();
-    } catch (e) { alert(e.reason || e.message); }
-}
+    }
 
-window.onload = init;
+    async function loadMarkets() {
+        const activeGrid = document.getElementById('active-grid');
+        const closedGrid = document.getElementById('closed-grid');
+        
+        try {
+            const count = await contractRead.marketCount();
+            activeGrid.innerHTML = "";
+            closedGrid.innerHTML = "";
+
+            for (let i = 0; i < Number(count); i++) {
+                const m = await contractRead.getMarket(i);
+                
+                const data = {
+                    id: i,
+                    question: m[0],
+                    deadline: Number(m[2]),
+                    yesPool: parseFloat(ethers.formatEther(m[4])),
+                    noPool: parseFloat(ethers.formatEther(m[5])),
+                    isResolved: m[6],
+                    outcome: m[7]
+                };
+
+                const total = data.yesPool + data.noPool;
+                const yesPct = total > 0 ? (data.yesPool / total) * 100 : 50;
+
+                const card = document.createElement('div');
+                card.className = "card";
+                
+                let content = `
+                    ${!data.isResolved ? `<div class="timer" data-time="${data.deadline}">Calculating...</div>` : ''}
+                    <div style="font-family:'Space Mono'; font-size:0.7rem; color:#6b7080;">#ID ${i}</div>
+                    <div class="question">${data.question}</div>
+                    
+                    <div class="pool-text">
+                        <span style="color:var(--yes)">YES: ${data.yesPool.toFixed(3)} ETH</span>
+                        <span style="color:var(--no)">NO: ${data.noPool.toFixed(3)} ETH</span>
+                    </div>
+                    <div class="graph-wrap">
+                        <div class="bar-yes" style="width: ${yesPct}%"></div>
+                        <div class="bar-no" style="width: ${100 - yesPct}%"></div>
+                    </div>
+                `;
+
+                if (!data.isResolved) {
+                    content += `
+                        <input type="number" step="0.01" placeholder="ETH Amount" id="in-${i}">
+                        <div class="btn-box">
+                            <button class="btn-yes" onclick="handleAction(${i}, 'yes')">VOTE YES</button>
+                            <button class="btn-no" onclick="handleAction(${i}, 'no')">VOTE NO</button>
+                        </div>
+                    `;
+                } else {
+                    content += `
+                        <div style="text-align:center; padding:12px; background:rgba(124,108,255,0.1); border-radius:8px; color:var(--accent); font-weight:700;">
+                            WINNER: ${data.outcome ? 'YES' : 'NO'}
+                        </div>
+                        <button class="btn-claim" onclick="handleAction(${i}, 'withdraw')">CLAIM WINNINGS</button>
+                    `;
+                }
+
+                content += `<div class="debug-line">State: Resolved=${data.isResolved} | Winner=${data.outcome}</div>`;
+                card.innerHTML = content;
+
+                if (data.isResolved) closedGrid.appendChild(card);
+                else activeGrid.appendChild(card);
+            }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('status').innerText = "❌ Blockchain Error: Check Contract Address.";
+        }
+    }
+
+    function refreshTimers() {
+        const timerElements = document.querySelectorAll('.timer');
+        timerElements.forEach(el => {
+            const deadline = parseInt(el.getAttribute('data-time'));
+            const now = Math.floor(Date.now() / 1000);
+            const diff = deadline - now;
+
+            if (diff <= 0) {
+                el.innerText = "⌛ Voting Closed";
+                el.style.color = "#6b7080";
+            } else {
+                const h = Math.floor(diff / 3600);
+                const m = Math.floor((diff % 3600) / 60);
+                const s = diff % 60;
+                el.innerText = `⏳ Closes in: ${h}h ${m}m ${s}s`;
+            }
+        });
+    }
+
+    async function handleAction(id, type) {
+        if (!signer) return alert("Please Connect MetaMask First!");
+        const status = document.getElementById('status');
+        const contractWrite = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
+
+        try {
+            let tx;
+            if (type === 'withdraw') {
+                // Simulation Pre-check
+                try { await contractWrite.withdrawWinnings.staticCall(id); }
+                catch (e) { return alert("Withdrawal Failed: You either didn't win, or you already claimed."); }
+                
+                tx = await contractWrite.withdrawWinnings(id);
+                status.innerText = "⏳ Processing Claim...";
+            } else {
+                const val = document.getElementById(`in-${id}`).value;
+                if (!val || val <= 0) return alert("Enter Amount");
+                const options = { value: ethers.parseEther(val) };
+                tx = (type === 'yes') ? await contractWrite.placeYes(id, options) : await contractWrite.placeNo(id, options);
+                status.innerText = "⏳ Submitting Bet...";
+            }
+
+            await tx.wait();
+            status.innerText = "✅ Success! Updating Dashboard...";
+            loadMarkets();
+        } catch (e) {
+            alert("Error: " + (e.reason || e.message));
+            status.innerText = "❌ Transaction Denied.";
+        }
+    }
 </script>
 </body>
 </html>
