@@ -1,29 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Group4Market — Global History</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
+  :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px; }
+  header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-family: 'Space Mono', monospace; font-size: 3rem; font-weight: 700; color: var(--accent); letter-spacing: -3px; }
+  .status-pill { background: #000; padding: 10px 20px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; border: 1px solid var(--border); display: inline-block; margin-bottom: 20px; color: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 25px; position: relative; border-top: 5px solid var(--accent); }
+  .question { font-size: 1.3rem; font-weight: 700; margin: 15px 0; min-height: 3rem; }
+  .stat-box { background: #000; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); flex: 1; }
+  .btn-connect { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-family: 'Space Mono'; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Group4Market</div>
+  <button id="connect-btn" class="btn-connect" onclick="connect()">Connect Wallet</button>
+</header>
+
+<div id="scan-status" class="status-pill">📡 Initializing Blockchain Scan...</div>
+<div id="master-grid" class="grid"></div>
+
+<script>
+// CONFIG
+const DEPLOYER = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
+const RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
+const ABI = [
+    "function marketCount() view returns (uint256)",
+    "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes, address yesAuditor, address noAuditor, address finalDecider, uint256 deciderFee, uint256 potAtSettle)"
+];
+
+let provider;
+
+window.onload = async () => {
+    provider = new ethers.JsonRpcProvider(RPC);
+    loadGlobalHistory();
+};
+
 async function loadGlobalHistory() {
     const status = document.getElementById('scan-status');
     const grid = document.getElementById('master-grid');
-    grid.innerHTML = "";
-
+    
     try {
-        // 1. Fetch TX list with a small retry if it fails
+        // 1. Fetch TX list from Etherscan
         const apiUrl = `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER}&sort=desc&apikey=FREE_TOKEN`;
         const response = await fetch(apiUrl);
         const data = await response.json();
 
+        // Check for Rate Limiting
         if (data.status === "0" && data.message === "NOTOK") {
-            status.innerText = "⏳ Rate limited. Retrying in 5 seconds...";
+            status.innerText = "⏳ Etherscan is busy. Retrying in 5s...";
             setTimeout(loadGlobalHistory, 5000);
             return;
         }
 
-        // 2. Identify all Contract Creations
+        // 2. Filter for unique contract deployments
         const contracts = [...new Set(data.result
             .filter(tx => tx.to === "" || (tx.contractAddress && tx.contractAddress !== ""))
             .map(tx => tx.contractAddress || tx.to)
         )];
 
-        status.innerText = `Found ${contracts.length} deployments. Loading markets...`;
+        status.innerText = `🔍 Found ${contracts.length} deployments. Checking for markets...`;
 
-        // 3. Loop with a "Breath" (100ms delay) so we don't crash the RPC
         for (const addr of contracts) {
             try {
                 const contract = new ethers.Contract(addr, ABI, provider);
@@ -31,17 +76,37 @@ async function loadGlobalHistory() {
                 
                 for (let i = 0; i < Number(count); i++) {
                     const m = await contract.getMarket(i);
-                    addCardToGrid(addr, i, m);
+                    const card = document.createElement('div');
+                    card.className = "card";
+                    card.innerHTML = `
+                        <div style="font-family: 'Space Mono'; font-size: 0.7rem; color: #6b7080;">Contract: ${addr.slice(0,10)}...</div>
+                        <div class="question">${m[0]}</div>
+                        <div style="display:flex; gap:10px;">
+                            <div class="stat-box"><small>YES</small><br><b style="color:var(--yes)">${ethers.formatEther(m[4])}</b></div>
+                            <div class="stat-box"><small>NO</small><br><b style="color:var(--no)">${ethers.formatEther(m[5])}</b></div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
                 }
-                // Small delay to prevent "429 Too Many Requests"
-                await new Promise(resolve => setTimeout(resolve, 100)); 
+                // Pause to avoid hitting Infura/Etherscan limits
+                await new Promise(r => setTimeout(r, 200));
             } catch (e) {
-                console.log(`Skipping: ${addr} (Not a compatible market)`);
+                // Not a market contract, skip quietly
             }
         }
-        status.innerText = `✅ Loaded ${grid.children.length} markets from ${contracts.length} deployments.`;
+        status.innerText = `✅ Loaded ${grid.children.length} total markets.`;
     } catch (err) {
-        status.innerText = "❌ Connection Error. Try refreshing in 10 seconds.";
+        status.innerText = "❌ Scan failed. Please check console for errors.";
         console.error(err);
     }
 }
+
+async function connect() {
+    if (!window.ethereum) return alert("Install MetaMask");
+    const browserProvider = new ethers.BrowserProvider(window.ethereum);
+    await browserProvider.getSigner();
+    document.getElementById('connect-btn').innerText = "Wallet Linked";
+}
+</script>
+</body>
+</html>
