@@ -3,51 +3,53 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Group4Market — Prediction Markets</title>
+<title>Group4Market — Live Prediction Hub</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
-
-  :root {
-    --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0;
-    --muted: #6b7080; --yes: #00d98b; --no: #ff4d6d; --accent: #7c6cff;
-  }
-
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+  :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
   header { position: sticky; top: 0; background: rgba(10,11,15,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-  .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); }
-  .main { max-width: 1000px; margin: 0 auto; padding: 2rem; }
-  
-  #markets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
-  .question { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; font-family: 'Space Mono'; font-size: 0.8rem; }
-  .stat-item { background: var(--bg); padding: 0.5rem; border-radius: 6px; text-align: center; }
-  
-  .bet-btn { width: 100%; padding: 0.6rem; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-  .yes { background: var(--yes); color: #003b26; }
-  .no { background: var(--no); color: #400010; }
-  .bet-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  
-  input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 0.5rem; width: 100%; border-radius: 6px; margin-bottom: 0.5rem; box-sizing: border-box; }
-  .user-bet { font-size: 0.75rem; color: var(--accent); margin-bottom: 0.5rem; font-family: 'Space Mono'; }
+  .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); font-size: 1.2rem; }
+  .main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; border-top: 4px solid var(--accent); transition: 0.3s; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .market-id { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--accent); margin-bottom: 0.5rem; opacity: 0.8; }
+  .question { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.2rem; line-height: 1.4; }
+  .stats { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+  .stat-pill { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 10px; text-align: center; }
+  .stat-label { display: block; font-size: 0.65rem; color: #6b7080; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val { font-family: 'Space Mono'; font-weight: 700; font-size: 0.9rem; }
+  .bet-input-grp { margin-bottom: 1rem; }
+  input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; width: 100%; border-radius: 8px; box-sizing: border-box; font-family: 'Space Mono'; margin-bottom: 10px; }
+  .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: 'Space Mono'; }
+  .btn-connect { width: auto; background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+  .btn-connect:hover { background: var(--accent); color: white; }
+  .btn-yes { background: var(--yes); color: #003b26; margin-bottom: 8px; }
+  .btn-no { background: var(--no); color: white; }
+  .user-badge { background: rgba(124, 108, 255, 0.15); color: var(--accent); padding: 8px; border-radius: 8px; font-size: 0.75rem; margin-bottom: 1rem; border: 1px dashed var(--accent); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Group4Market</div>
-  <button id="connect-btn" class="bet-btn" style="width:auto; background:var(--surface); color:white; border:1px solid var(--accent)" onclick="connect()">Connect Wallet</button>
+  <div class="logo">🔮 Group4Market</div>
+  <button id="connect-btn" class="btn btn-connect" onclick="connect()">Connect Wallet</button>
 </header>
 
 <main class="main">
-  <div id="markets-grid">
-    <p>Loading markets from blockchain...</p>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Live Markets</h2>
+    <button onclick="syncMarkets()" style="background:none; border:none; color:var(--accent); cursor:pointer; font-family:'Space Mono'; font-size:0.8rem;">[ Refresh Data ]</button>
+  </div>
+  <div id="markets-grid" class="grid">
+    <p style="grid-column: 1/-1; text-align: center; color: var(--accent);">Syncing with Sepolia...</p>
   </div>
 </main>
 
 <script>
-// 1. SETTINGS FROM YOUR BACKEND
+// Your specific contract from the .ipynb file
 const CONTRACT_ADDRESS = "0x8DA1A881D4eA5a8C273aA6877987ef505a097f4a";
 const ABI = [
   "function marketCount() view returns (uint256)",
@@ -58,78 +60,97 @@ const ABI = [
   "function noBets(uint256, address) view returns (uint256)"
 ];
 
-let provider, signer, address;
+let provider, signer, userAddress;
 
-// 2. AUTOMATIC INITIALIZATION
+// AUTO-START
 window.onload = async () => {
-    // Connect to Sepolia (read-only by default)
+    // Connect via public RPC first so the page isn't blank
     provider = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d");
-    await refreshMarkets();
+    await syncMarkets();
 };
 
 async function connect() {
     if (!window.ethereum) return alert("Please install MetaMask");
     const browserProvider = new ethers.BrowserProvider(window.ethereum);
     signer = await browserProvider.getSigner();
-    address = await signer.getAddress();
-    document.getElementById('connect-btn').innerText = address.slice(0,6)+"..."+address.slice(-4);
-    await refreshMarkets();
+    userAddress = await signer.getAddress();
+    document.getElementById('connect-btn').innerText = userAddress.slice(0,6)+"..."+userAddress.slice(-4);
+    await syncMarkets();
 }
 
-async function refreshMarkets() {
+async function syncMarkets() {
     const grid = document.getElementById('markets-grid');
     const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
     
     try {
         const count = await contract.marketCount();
-        grid.innerHTML = "";
+        if (count == 0n) {
+            grid.innerHTML = "<p>No markets found. Deploy one in your notebook!</p>";
+            return;
+        }
         
-        for (let i = 0; i < count; i++) {
+        grid.innerHTML = ""; // Clear loader
+        
+        // Loop backwards (newest markets first)
+        for (let i = Number(count) - 1; i >= 0; i--) {
             const m = await contract.getMarket(i);
             let myYes = 0n, myNo = 0n;
             
-            // Auto-fetch bets if user is connected
-            if (address) {
-                myYes = await contract.yesBets(i, address);
-                myNo = await contract.noBets(i, address);
+            if (userAddress) {
+                myYes = await contract.yesBets(i, userAddress);
+                myNo = await contract.noBets(i, userAddress);
             }
 
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <div class="question">${m.question}</div>
+                <div class="market-id">ID: #${i}</div>
+                <div class="question">${m[0]}</div>
                 <div class="stats">
-                    <div class="stat-item">YES: ${ethers.formatEther(m.yesPool)} ETH</div>
-                    <div class="stat-item">NO: ${ethers.formatEther(m.noPool)} ETH</div>
+                    <div class="stat-pill">
+                        <span class="stat-label">YES Pool</span>
+                        <span class="stat-val">${ethers.formatEther(m[4])} ETH</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-label">NO Pool</span>
+                        <span class="stat-val">${ethers.formatEther(m[5])} ETH</span>
+                    </div>
                 </div>
-                ${(myYes > 0 || myNo > 0) ? `<div class="user-bet">Your Bet: ${ethers.formatEther(myYes)} YES | ${ethers.formatEther(myNo)} NO</div>` : ''}
-                <input type="number" step="0.01" placeholder="Amount ETH" id="amt-${i}">
-                <div style="display:flex; gap:0.5rem">
-                    <button class="bet-btn yes" onclick="bet(${i}, true)">Bet YES</button>
-                    <button class="bet-btn no" onclick="bet(${i}, false)">Bet NO</button>
+                ${(myYes > 0 || myNo > 0) ? `
+                    <div class="user-badge">
+                        <b>Your Position:</b><br>
+                        ${ethers.formatEther(myYes)} YES | ${ethers.formatEther(myNo)} NO
+                    </div>` : ''}
+                <div class="bet-input-grp">
+                    <input type="number" step="0.001" placeholder="Amount (ETH)" id="amt-${i}">
+                    <button class="btn btn-yes" onclick="bet(${i}, true)">Place YES Bet</button>
+                    <button class="btn btn-no" onclick="bet(${i}, false)">Place NO Bet</button>
                 </div>
             `;
             grid.appendChild(card);
         }
     } catch (e) {
-        grid.innerHTML = "<p>Error: Could not sync with contract. Check your Sepolia connection.</p>";
+        console.error(e);
+        grid.innerHTML = "<p>Error: Failed to fetch data. Ensure you're on Sepolia.</p>";
     }
 }
 
 async function bet(id, isYes) {
     if (!signer) return connect();
     const val = document.getElementById(`amt-${id}`).value;
-    if (!val) return alert("Enter amount");
+    if (!val || val <= 0) return alert("Enter an ETH amount");
     
     const userContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
     try {
         const tx = isYes ? 
             await userContract.placeYes(id, {value: ethers.parseEther(val)}) :
             await userContract.placeNo(id, {value: ethers.parseEther(val)});
+        
+        alert("Transaction sent! Refreshing after block confirmation...");
         await tx.wait();
-        await refreshMarkets(); // Auto-refresh after bet
+        await syncMarkets(); 
     } catch (e) {
-        alert("Transaction failed: " + e.message);
+        alert("Transaction failed: " + (e.reason || e.message));
     }
 }
 </script>
