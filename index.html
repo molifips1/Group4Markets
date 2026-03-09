@@ -37,12 +37,12 @@
     <button onclick="syncAll()" style="background:none; border:none; color:var(--accent); cursor:pointer; font-family:'Space Mono';">[ Force Refresh ]</button>
   </div>
   <div id="markets-grid" class="grid">
-    <p>Loading markets directly from blockchain...</p>
+    <p>Loading markets from blockchain...</p>
   </div>
 </main>
 
 <script>
-// YOUR CONTRACT ADDRESS FROM BACKEND
+// 1. CONTRACT CONFIGURATION
 const CONTRACT_ADDRESS = "0x8DA1A881D4eA5a8C273aA6877987ef505a097f4a";
 const ABI = [
   "function marketCount() view returns (uint256)",
@@ -55,8 +55,9 @@ const ABI = [
 
 let provider, signer, userAddress;
 
-// 1. THIS RUNS IMMEDIATELY ON PAGE LOAD
+// 2. AUTOMATIC LOAD ON PAGE OPEN
 window.onload = async () => {
+    // Use a public RPC so markets show up even if MetaMask is locked
     provider = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d");
     await syncAll();
 };
@@ -67,7 +68,7 @@ async function connect() {
     signer = await browserProvider.getSigner();
     userAddress = await signer.getAddress();
     document.getElementById('connect-btn').innerText = userAddress.slice(0,6)+"..."+userAddress.slice(-4);
-    await syncAll();
+    await syncAll(); // Refresh to show user bets
 }
 
 async function syncAll() {
@@ -75,21 +76,20 @@ async function syncAll() {
     const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
     
     try {
-        // AUTOMATIC DETECTION: Asking the contract how many markets exist right now
+        // FETCH TOTAL COUNT FROM BLOCKCHAIN
         const count = await contract.marketCount();
         if (count == 0n) {
-            grid.innerHTML = "<p>No markets created yet. Run your notebook script!</p>";
+            grid.innerHTML = "<p>No markets created. Run your Python script to create one!</p>";
             return;
         }
         
-        grid.innerHTML = ""; // Clear the "Loading" text
+        grid.innerHTML = ""; // Clear loader
 
-        // Loop through every single market ID from 0 to current count
+        // LOOP THROUGH ALL CREATED MARKETS
         for (let i = 0; i < Number(count); i++) {
             const m = await contract.getMarket(i);
             let myYes = 0n, myNo = 0n;
             
-            // Auto-pick up user's personal bet history
             if (userAddress) {
                 myYes = await contract.yesBets(i, userAddress);
                 myNo = await contract.noBets(i, userAddress);
@@ -112,12 +112,11 @@ async function syncAll() {
                 <button class="btn btn-yes" onclick="bet(${i}, true)">Bet YES</button>
                 <button class="btn btn-no" onclick="bet(${i}, false)">Bet NO</button>
             `;
-            // newest markets appear at the top
+            // Add newest markets to the top of the grid
             grid.prepend(card);
         }
     } catch (e) {
-        console.error(e);
-        grid.innerHTML = "<p>Error: Could not connect to Sepolia. Check your internet.</p>";
+        grid.innerHTML = "<p>Sync Error. Check Sepolia Connection.</p>";
     }
 }
 
@@ -131,9 +130,9 @@ async function bet(id, isYes) {
         const tx = isYes ? 
             await userContract.placeYes(id, {value: ethers.parseEther(val)}) :
             await userContract.placeNo(id, {value: ethers.parseEther(val)});
-        alert("Transaction sent! Refreshing after block confirmation...");
+        alert("Transaction sent! Refreshing after confirmation...");
         await tx.wait();
-        await syncAll(); // Automatically refresh after betting
+        await syncAll(); 
     } catch (e) {
         alert("Failed: " + e.message);
     }
