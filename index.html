@@ -3,53 +3,46 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Group4Market — Live Prediction Hub</title>
+<title>Group4Market — Live Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
   :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
   header { position: sticky; top: 0; background: rgba(10,11,15,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-  .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); font-size: 1.2rem; }
+  .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); }
   .main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; border-top: 4px solid var(--accent); transition: 0.3s; }
-  .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-  .market-id { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--accent); margin-bottom: 0.5rem; opacity: 0.8; }
   .question { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.2rem; line-height: 1.4; }
-  .stats { display: flex; gap: 10px; margin-bottom: 1.5rem; }
-  .stat-pill { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 10px; text-align: center; }
-  .stat-label { display: block; font-size: 0.65rem; color: #6b7080; text-transform: uppercase; margin-bottom: 4px; }
-  .stat-val { font-family: 'Space Mono'; font-weight: 700; font-size: 0.9rem; }
-  .bet-input-grp { margin-bottom: 1rem; }
-  input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; width: 100%; border-radius: 8px; box-sizing: border-box; font-family: 'Space Mono'; margin-bottom: 10px; }
-  .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: 'Space Mono'; }
-  .btn-connect { width: auto; background: transparent; border: 1px solid var(--accent); color: var(--accent); }
-  .btn-connect:hover { background: var(--accent); color: white; }
+  .stats { display: flex; gap: 10px; margin-bottom: 1rem; }
+  .stat-pill { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 8px; border-radius: 8px; text-align: center; font-size: 0.8rem; }
+  .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Space Mono'; }
   .btn-yes { background: var(--yes); color: #003b26; margin-bottom: 8px; }
   .btn-no { background: var(--no); color: white; }
-  .user-badge { background: rgba(124, 108, 255, 0.15); color: var(--accent); padding: 8px; border-radius: 8px; font-size: 0.75rem; margin-bottom: 1rem; border: 1px dashed var(--accent); }
+  input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 10px; width: 100%; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
+  .user-badge { background: #7c6cff15; color: var(--accent); padding: 8px; border-radius: 8px; font-size: 0.75rem; margin-bottom: 1rem; border: 1px dashed var(--accent); font-family: 'Space Mono'; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">🔮 Group4Market</div>
-  <button id="connect-btn" class="btn btn-connect" onclick="connect()">Connect Wallet</button>
+  <button id="connect-btn" class="btn" style="width:auto; background:transparent; border:1px solid var(--accent); color:var(--accent)" onclick="connect()">Connect Wallet</button>
 </header>
 
 <main class="main">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
     <h2>Live Markets</h2>
-    <button onclick="syncMarkets()" style="background:none; border:none; color:var(--accent); cursor:pointer; font-family:'Space Mono'; font-size:0.8rem;">[ Refresh Data ]</button>
+    <button onclick="syncAll()" style="background:none; border:none; color:var(--accent); cursor:pointer; font-family:'Space Mono';">[ Force Refresh ]</button>
   </div>
   <div id="markets-grid" class="grid">
-    <p style="grid-column: 1/-1; text-align: center; color: var(--accent);">Syncing with Sepolia...</p>
+    <p>Loading markets directly from blockchain...</p>
   </div>
 </main>
 
 <script>
-// Your specific contract from the .ipynb file
+// YOUR CONTRACT ADDRESS FROM BACKEND
 const CONTRACT_ADDRESS = "0x8DA1A881D4eA5a8C273aA6877987ef505a097f4a";
 const ABI = [
   "function marketCount() view returns (uint256)",
@@ -62,40 +55,41 @@ const ABI = [
 
 let provider, signer, userAddress;
 
-// AUTO-START
+// 1. THIS RUNS IMMEDIATELY ON PAGE LOAD
 window.onload = async () => {
-    // Connect via public RPC first so the page isn't blank
     provider = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d");
-    await syncMarkets();
+    await syncAll();
 };
 
 async function connect() {
-    if (!window.ethereum) return alert("Please install MetaMask");
+    if (!window.ethereum) return alert("Install MetaMask");
     const browserProvider = new ethers.BrowserProvider(window.ethereum);
     signer = await browserProvider.getSigner();
     userAddress = await signer.getAddress();
     document.getElementById('connect-btn').innerText = userAddress.slice(0,6)+"..."+userAddress.slice(-4);
-    await syncMarkets();
+    await syncAll();
 }
 
-async function syncMarkets() {
+async function syncAll() {
     const grid = document.getElementById('markets-grid');
     const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
     
     try {
+        // AUTOMATIC DETECTION: Asking the contract how many markets exist right now
         const count = await contract.marketCount();
         if (count == 0n) {
-            grid.innerHTML = "<p>No markets found. Deploy one in your notebook!</p>";
+            grid.innerHTML = "<p>No markets created yet. Run your notebook script!</p>";
             return;
         }
         
-        grid.innerHTML = ""; // Clear loader
-        
-        // Loop backwards (newest markets first)
-        for (let i = Number(count) - 1; i >= 0; i--) {
+        grid.innerHTML = ""; // Clear the "Loading" text
+
+        // Loop through every single market ID from 0 to current count
+        for (let i = 0; i < Number(count); i++) {
             const m = await contract.getMarket(i);
             let myYes = 0n, myNo = 0n;
             
+            // Auto-pick up user's personal bet history
             if (userAddress) {
                 myYes = await contract.yesBets(i, userAddress);
                 myNo = await contract.noBets(i, userAddress);
@@ -104,53 +98,44 @@ async function syncMarkets() {
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <div class="market-id">ID: #${i}</div>
+                <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px">MARKET ID: #${i}</div>
                 <div class="question">${m[0]}</div>
                 <div class="stats">
-                    <div class="stat-pill">
-                        <span class="stat-label">YES Pool</span>
-                        <span class="stat-val">${ethers.formatEther(m[4])} ETH</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-label">NO Pool</span>
-                        <span class="stat-val">${ethers.formatEther(m[5])} ETH</span>
-                    </div>
+                    <div class="stat-pill"><b>YES:</b> ${ethers.formatEther(m[4])} ETH</div>
+                    <div class="stat-pill"><b>NO:</b> ${ethers.formatEther(m[5])} ETH</div>
                 </div>
                 ${(myYes > 0 || myNo > 0) ? `
                     <div class="user-badge">
-                        <b>Your Position:</b><br>
-                        ${ethers.formatEther(myYes)} YES | ${ethers.formatEther(myNo)} NO
+                        Your Bet: ${ethers.formatEther(myYes)} YES | ${ethers.formatEther(myNo)} NO
                     </div>` : ''}
-                <div class="bet-input-grp">
-                    <input type="number" step="0.001" placeholder="Amount (ETH)" id="amt-${i}">
-                    <button class="btn btn-yes" onclick="bet(${i}, true)">Place YES Bet</button>
-                    <button class="btn btn-no" onclick="bet(${i}, false)">Place NO Bet</button>
-                </div>
+                <input type="number" step="0.01" placeholder="Amount (ETH)" id="input-${i}">
+                <button class="btn btn-yes" onclick="bet(${i}, true)">Bet YES</button>
+                <button class="btn btn-no" onclick="bet(${i}, false)">Bet NO</button>
             `;
-            grid.appendChild(card);
+            // newest markets appear at the top
+            grid.prepend(card);
         }
     } catch (e) {
         console.error(e);
-        grid.innerHTML = "<p>Error: Failed to fetch data. Ensure you're on Sepolia.</p>";
+        grid.innerHTML = "<p>Error: Could not connect to Sepolia. Check your internet.</p>";
     }
 }
 
 async function bet(id, isYes) {
     if (!signer) return connect();
-    const val = document.getElementById(`amt-${id}`).value;
-    if (!val || val <= 0) return alert("Enter an ETH amount");
+    const val = document.getElementById(`input-${id}`).value;
+    if (!val) return alert("Enter an amount");
     
     const userContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
     try {
         const tx = isYes ? 
             await userContract.placeYes(id, {value: ethers.parseEther(val)}) :
             await userContract.placeNo(id, {value: ethers.parseEther(val)});
-        
         alert("Transaction sent! Refreshing after block confirmation...");
         await tx.wait();
-        await syncMarkets(); 
+        await syncAll(); // Automatically refresh after betting
     } catch (e) {
-        alert("Transaction failed: " + (e.reason || e.message));
+        alert("Failed: " + e.message);
     }
 }
 </script>
