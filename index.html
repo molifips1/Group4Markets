@@ -2,120 +2,111 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Group4Market — Global History</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
-  :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; --muted: #6b7080; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
+  :root { --bg: #0a0b0f; --surface: #111318; --border: #1e2029; --text: #e8eaf0; --accent: #7c6cff; --yes: #00d98b; --no: #ff4d6d; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px; }
   
-  header { position: sticky; top: 0; background: rgba(10,11,15,0.95); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-  .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); font-size: 3.5rem; letter-spacing: -4px; line-height: 0.8; margin: 0; }
+  header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+  .logo { font-family: 'Space Mono', monospace; font-size: 3rem; font-weight: 700; color: var(--accent); letter-spacing: -3px; }
   
-  .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-  .status-bar { background: #000; padding: 15px 25px; border-radius: 12px; font-family: 'Space Mono'; font-size: 0.8rem; color: var(--muted); margin-bottom: 2rem; border-left: 5px solid var(--accent); }
+  .status-pill { background: #000; padding: 10px 20px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; border: 1px solid var(--border); display: inline-block; margin-bottom: 20px; }
   
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 2rem; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; transition: 0.3s; position: relative; }
-  .card:hover { border-color: var(--accent); transform: translateY(-5px); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 25px; position: relative; border-top: 5px solid var(--accent); transition: 0.3s; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   
-  .contract-tag { position: absolute; top: -10px; right: 20px; background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-family: 'Space Mono'; }
-  .question { font-size: 1.4rem; font-weight: 700; margin-top: 10px; margin-bottom: 1.5rem; line-height: 1.3; }
+  .market-id { font-family: 'Space Mono'; font-size: 0.7rem; color: #6b7080; text-transform: uppercase; }
+  .question { font-size: 1.4rem; font-weight: 700; margin: 15px 0; min-height: 3.5rem; line-height: 1.2; }
   
-  .pool-stats { display: flex; gap: 10px; margin-bottom: 1.5rem; }
-  .pool { flex: 1; background: var(--bg); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
-  .pool b { display: block; font-size: 1.1rem; font-family: 'Space Mono'; }
-  
-  .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Space Mono'; margin-top: 5px; }
-  .btn-yes { background: var(--yes); color: #003b26; }
-  .btn-no { background: var(--no); color: white; }
-  .btn-connect { width: auto; background: var(--accent); color: white; padding: 10px 25px; }
-  
-  input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Space Mono'; }
+  .stats { display: flex; gap: 10px; margin-bottom: 20px; }
+  .stat-box { flex: 1; background: #000; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+  .stat-box small { font-size: 0.6rem; color: #6b7080; display: block; }
+  .stat-box b { font-family: 'Space Mono'; font-size: 1rem; }
+
+  .btn-connect { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-family: 'Space Mono'; cursor: pointer; float: right; }
 </style>
 </head>
 <body>
 
 <header>
+  <button id="connect-btn" class="btn-connect" onclick="connect()">Connect Wallet</button>
   <div class="logo">Group4Market</div>
-  <button id="connect-btn" class="btn btn-connect" onclick="connect()">Connect Wallet</button>
+  <div id="scan-status" class="status-pill">🔍 Scanning Blockchain for 0xb215...</div>
 </header>
 
-<main class="main">
-  <div class="status-bar" id="load-status">🔍 Scanning all historical deployments for 0xb215...</div>
-  
-  <div id="master-grid" class="grid"></div>
-</main>
+<div id="master-grid" class="grid"></div>
 
 <script>
 const DEPLOYER = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
 const RPC = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
 const ABI = [
-  "function marketCount() view returns (uint256)",
-  "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved)"
+    "function marketCount() view returns (uint256)",
+    "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes, address yesAuditor, address noAuditor, address finalDecider, uint256 deciderFee, uint256 potAtSettle)"
 ];
 
 let provider, signer;
 
 window.onload = async () => {
     provider = new ethers.JsonRpcProvider(RPC);
-    await scanAllContracts();
+    await loadGlobalHistory();
 };
 
-async function scanAllContracts() {
-    const status = document.getElementById('load-status');
+async function loadGlobalHistory() {
+    const status = document.getElementById('scan-status');
     const grid = document.getElementById('master-grid');
     grid.innerHTML = "";
 
     try {
-        // 1. Get ALL transactions from the deployer
-        const res = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER}&sort=desc&apikey=FREE_TOKEN`);
-        const data = await res.json();
+        // 1. Get ALL transactions for your wallet from Etherscan
+        const response = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER}&sort=desc&apikey=FREE_TOKEN`);
+        const data = await response.json();
         
-        // 2. Filter for transactions that created contracts
-        const contractAddresses = [...new Set(data.result
+        // 2. Filter out every transaction that created a contract
+        const contracts = [...new Set(data.result
             .filter(tx => tx.to === "" || (tx.contractAddress && tx.contractAddress !== ""))
             .map(tx => tx.contractAddress || tx.to)
         )];
 
-        status.innerText = `Found ${contractAddresses.length} historical contracts. Loading all markets...`;
+        status.innerText = `Found ${contracts.length} unique deployments. Loading markets...`;
 
-        // 3. Loop through every contract ever made
-        for (const addr of contractAddresses) {
+        // 3. For each contract, find all its markets
+        for (const addr of contracts) {
             try {
                 const contract = new ethers.Contract(addr, ABI, provider);
                 const count = await contract.marketCount();
                 
                 for (let i = 0; i < Number(count); i++) {
                     const m = await contract.getMarket(i);
-                    renderMarket(addr, i, m);
+                    addCardToGrid(addr, i, m);
                 }
             } catch (e) {
-                console.log(`Contract at ${addr} is not a Market contract or is too old.`);
+                // Skip contracts that aren't Group4Market (like standard transfers)
+                console.log(`Skipping non-market contract: ${addr}`);
             }
         }
-        status.innerText = `✅ Loaded all historical markets from ${contractAddresses.length} deployments.`;
-    } catch (e) {
-        status.innerText = "❌ History scan failed. Check your internet connection.";
+        status.innerText = `✅ Success: Showing all markets from ${contracts.length} historical deployments.`;
+    } catch (err) {
+        status.innerText = "❌ Scan failed. Etherscan API might be busy.";
     }
 }
 
-function renderMarket(contractAddr, id, m) {
+function addCardToGrid(address, id, m) {
     const grid = document.getElementById('master-grid');
     const card = document.createElement('div');
     card.className = "card";
     card.innerHTML = `
-        <div class="contract-tag">Contract: ${contractAddr.slice(0,6)}...</div>
-        <div style="font-family:'Space Mono'; font-size:0.7rem; color:var(--muted);">MARKET #${id}</div>
+        <div class="market-id">Contract ${address.slice(0,6)}... | Market #${id}</div>
         <div class="question">${m[0]}</div>
-        <div class="pool-stats">
-            <div class="pool"><small>YES</small><b style="color:var(--yes)">${ethers.formatEther(m[4])}</b></div>
-            <div class="pool"><small>NO</small><b style="color:var(--no)">${ethers.formatEther(m[5])}</b></div>
+        <div class="stats">
+            <div class="stat-box"><small>YES POOL</small><b style="color:var(--yes)">${ethers.formatEther(m[4])} ETH</b></div>
+            <div class="stat-box"><small>NO POOL</small><b style="color:var(--no)">${ethers.formatEther(m[5])} ETH</b></div>
         </div>
-        <input type="number" step="0.01" placeholder="ETH Amount" id="in-${contractAddr}-${id}">
-        <button class="btn btn-yes" onclick="bet('${contractAddr}', ${id}, true)">Bet YES</button>
-        <button class="btn btn-no" onclick="bet('${contractAddr}', ${id}, false)">Bet NO</button>
+        <div style="font-size: 0.7rem; color: #6b7080; text-align: center;">
+            Ends: ${new Date(Number(m[2]) * 1000).toLocaleDateString()}
+        </div>
     `;
     grid.appendChild(card);
 }
@@ -124,21 +115,7 @@ async function connect() {
     if (!window.ethereum) return alert("Install MetaMask");
     const browserProvider = new ethers.BrowserProvider(window.ethereum);
     signer = await browserProvider.getSigner();
-    document.getElementById('connect-btn').innerText = "Connected";
-}
-
-async function bet(contractAddr, id, isYes) {
-    if (!signer) return connect();
-    const val = document.getElementById(`in-${contractAddr}-${id}`).value;
-    const betABI = ["function placeYes(uint256) payable", "function placeNo(uint256) payable"];
-    const userContract = new ethers.Contract(contractAddr, betABI, signer);
-    try {
-        const tx = isYes ? 
-            await userContract.placeYes(id, {value: ethers.parseEther(val)}) : 
-            await userContract.placeNo(id, {value: ethers.parseEther(val)});
-        await tx.wait();
-        location.reload(); 
-    } catch (e) { alert(e.message); }
+    document.getElementById('connect-btn').innerText = "Wallet Linked";
 }
 </script>
 </body>
