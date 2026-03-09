@@ -15,21 +15,18 @@
 
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
   
-  /* MASSIVE BRANDED HEADER */
   header { 
     position: sticky; top: 0; background: rgba(10,11,15,0.95); backdrop-filter: blur(15px); 
     border-bottom: 1px solid var(--border); padding: 2.5rem 4rem; 
     display: flex; justify-content: space-between; align-items: center; z-index: 100; 
   }
-  .logo-container { display: flex; flex-direction: column; }
   .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); font-size: 4.5rem; letter-spacing: -5px; line-height: 0.8; margin: 0; }
   .network-tag { font-family: 'Space Mono', monospace; font-size: 1.1rem; color: #ff9f43; text-transform: uppercase; margin-top: 10px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
   .dot { width: 12px; height: 12px; background: #ff9f43; border-radius: 50%; box-shadow: 0 0 15px #ff9f43; animation: pulse 2s infinite; }
-  @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
   .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
   
-  /* AUTO-DETECTION PANEL */
   .discovery-status { background: #000; padding: 20px 30px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center; border-left: 8px solid var(--accent); }
   .status-info { font-family: 'Space Mono'; font-size: 0.85rem; }
   .status-label { color: var(--muted); text-transform: uppercase; font-size: 0.7rem; margin-bottom: 4px; display: block; }
@@ -37,16 +34,12 @@
   .category-header { font-size: 2.2rem; font-weight: 700; margin: 4rem 0 1.5rem; display: flex; align-items: center; gap: 20px; }
   .count-pill { background: var(--surface); border: 1px solid var(--border); font-size: 1.1rem; padding: 5px 20px; border-radius: 40px; color: var(--accent); font-family: 'Space Mono'; }
 
-  /* MARKET GRID & CARDS */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 2.5rem; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 2.5rem; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
-  .card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-  .card.open { border-top: 8px solid var(--yes); }
-  .card.closed { border-top: 8px solid var(--muted); opacity: 0.65; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 2.5rem; transition: 0.4s; position: relative; border-top: 8px solid var(--muted); }
+  .card.open { border-top-color: var(--yes); }
   
   .question { font-size: 1.8rem; font-weight: 700; margin-bottom: 2rem; line-height: 1.2; min-height: 4.5rem; }
-  .stats-row { display: flex; gap: 20px; margin-bottom: 2rem; }
-  .pool { flex: 1; background: var(--bg); padding: 18px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+  .pool { flex: 1; background: var(--bg); padding: 18px; border-radius: 16px; border: 1px solid var(--border); text-align: center; margin-bottom: 1rem; }
   .pool small { color: var(--muted); text-transform: uppercase; font-size: 0.7rem; font-family: 'Space Mono'; }
   .pool div { font-family: 'Space Mono'; font-weight: 700; font-size: 1.4rem; margin-top: 8px; }
 
@@ -54,7 +47,6 @@
   .btn-connect { width: auto; background: var(--accent); color: white; padding: 12px 35px; border-radius: 50px; font-size: 1.1rem; }
   .btn-yes { background: var(--yes); color: #003b26; margin-bottom: 12px; }
   .btn-no { background: var(--no); color: white; }
-  
   input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 16px; width: 100%; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-family: 'Space Mono'; font-size: 1.1rem; }
 </style>
 </head>
@@ -71,29 +63,22 @@
 <main class="main">
   <div class="discovery-status">
     <div class="status-info">
-      <span class="status-label">Tracking Deployer Address</span>
-      <span id="deployer-display">Scanning...</span>
+      <span class="status-label">Tracking Deployer</span>
+      <span id="deployer-display">0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4</span>
     </div>
     <div class="status-info">
       <span class="status-label">Active Contract (Auto-Detected)</span>
-      <span id="active-contract" style="color:var(--accent); font-weight:bold;">Finding latest deployment...</span>
+      <span id="active-contract" style="color:var(--accent); font-weight:bold;">Finding...</span>
     </div>
   </div>
 
-  <div class="category-header">🟢 OPEN FOR BETTING <span class="count-pill" id="count-open">0</span></div>
+  <div class="category-header">🟢 ACTIVE MARKETS <span class="count-pill" id="count-open">0</span></div>
   <div id="grid-open" class="grid"></div>
-
-  <div class="category-header">🔴 CLOSED / SETTLED <span class="count-pill" id="count-closed">0</span></div>
-  <div id="grid-closed" class="grid"></div>
 </main>
 
 <script>
-// ==========================================================
-// CONFIGURATION
-// ==========================================================
 const RPC_URL = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
-const DEPLOYER_WALLET = "0x8DA1A881D4eA5a8C273aA6877987ef505a097f4a"; // Ensure this matches your deployment wallet!
-// ==========================================================
+const DEPLOYER_WALLET = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
 
 const ABI = [
   "function marketCount() view returns (uint256)",
@@ -105,19 +90,18 @@ const ABI = [
 let provider, signer, activeContractAddr;
 
 window.onload = async () => {
-    document.getElementById('deployer-display').innerText = DEPLOYER_WALLET;
     provider = new ethers.JsonRpcProvider(RPC_URL);
     await autoDetectLatestContract();
 };
 
 async function autoDetectLatestContract() {
     try {
-        // We use Etherscan to find the latest contract created by YOUR wallet address
-        const url = `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER_WALLET}&startblock=0&endblock=99999999&sort=desc&apikey=FREE_TOKEN`;
+        // Find the last "Contract Creation" by YOUR wallet
+        const url = `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${DEPLOYER_WALLET}&sort=desc&apikey=FREE_TOKEN`;
         const res = await fetch(url);
         const data = await res.json();
         
-        // Find the most recent "Contract Creation" (tx with empty 'to' field)
+        // Find the most recent transaction with no 'to' (Contract Creation)
         const latestTx = data.result.find(tx => tx.to === "" || (tx.contractAddress && tx.contractAddress !== ""));
         
         if (latestTx) {
@@ -127,68 +111,52 @@ async function autoDetectLatestContract() {
         }
     } catch (e) {
         console.error("Discovery error:", e);
-        document.getElementById('active-contract').innerText = "Manual fallback required.";
     }
 }
 
 async function syncAllMarkets() {
-    if (!activeContractAddr) return;
     const gridOpen = document.getElementById('grid-open');
-    const gridClosed = document.getElementById('grid-closed');
     const contract = new ethers.Contract(activeContractAddr, ABI, provider);
-    
     try {
         const total = await contract.marketCount();
-        const now = Math.floor(Date.now() / 1000);
-        gridOpen.innerHTML = ""; gridClosed.innerHTML = "";
-        let openCount = 0; let closedCount = 0;
-
+        gridOpen.innerHTML = "";
         for (let i = 0; i < Number(total); i++) {
             const m = await contract.getMarket(i);
-            const isClosed = (now > Number(m[2])) || (Number(m[3]) != 0);
-
             const card = document.createElement('div');
-            card.className = `card ${isClosed ? 'closed' : 'open'}`;
+            card.className = 'card open';
             card.innerHTML = `
-                <div style="font-family:'Space Mono'; font-size:0.8rem; color:var(--muted); margin-bottom:12px;">ID #${i}</div>
                 <div class="question">${m[0]}</div>
-                <div class="stats-row">
-                    <div class="pool"><small>YES Pool</small><div style="color:var(--yes)">${ethers.formatEther(m[4])} ETH</div></div>
-                    <div class="pool"><small>NO Pool</small><div style="color:var(--no)">${ethers.formatEther(m[5])} ETH</div></div>
+                <div style="display:flex; gap:10px;">
+                    <div class="pool"><small>YES</small><div style="color:var(--yes)">${ethers.formatEther(m[4])} ETH</div></div>
+                    <div class="pool"><small>NO</small><div style="color:var(--no)">${ethers.formatEther(m[5])} ETH</div></div>
                 </div>
-                ${!isClosed ? `
-                    <input type="number" step="0.001" placeholder="Amount (ETH)" id="in-${i}">
-                    <button class="btn btn-yes" onclick="bet(${i}, true)">Place YES Bet</button>
-                    <button class="btn btn-no" onclick="bet(${i}, false)">Place NO Bet</button>
-                ` : '<div style="text-align:center; padding:20px; border:1px dashed var(--border); border-radius:12px; color:var(--muted); font-family:Space Mono;">MARKET CLOSED</div>'}
+                <input type="number" step="0.001" placeholder="Amount (ETH)" id="in-${i}">
+                <button class="btn btn-yes" onclick="bet(${i}, true)">Bet YES</button>
+                <button class="btn btn-no" onclick="bet(${i}, false)">Bet NO</button>
             `;
-
-            if (isClosed) { gridClosed.prepend(card); closedCount++; }
-            else { gridOpen.prepend(card); openCount++; }
+            gridOpen.appendChild(card);
         }
-        document.getElementById('count-open').innerText = openCount;
-        document.getElementById('count-closed').innerText = closedCount;
-    } catch (e) { console.error("Sync error:", e); }
+        document.getElementById('count-open').innerText = total;
+    } catch (e) { console.error(e); }
 }
 
 async function connect() {
-    if (!window.ethereum) return alert("Please install MetaMask");
+    if (!window.ethereum) return alert("Install MetaMask");
     const browserProvider = new ethers.BrowserProvider(window.ethereum);
     signer = await browserProvider.getSigner();
-    document.getElementById('connect-btn').innerText = "Wallet Connected";
+    document.getElementById('connect-btn').innerText = "Connected";
     await syncAllMarkets();
 }
 
 async function bet(id, isYes) {
     if (!signer) return connect();
     const val = document.getElementById(`in-${id}`).value;
-    if (!val || val <= 0) return alert("Enter a valid amount");
     const userContract = new ethers.Contract(activeContractAddr, ABI, signer);
     try {
         const tx = isYes ? await userContract.placeYes(id, {value: ethers.parseEther(val)}) : await userContract.placeNo(id, {value: ethers.parseEther(val)});
         await tx.wait();
         await syncAllMarkets();
-    } catch (e) { alert("Transaction failed: " + (e.reason || e.message)); }
+    } catch (e) { alert(e.message); }
 }
 </script>
 </body>
