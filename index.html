@@ -88,6 +88,127 @@
     font-size: 0.65rem;
   }
 
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 36px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 16px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--subtext);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+  }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  /* ── Bets List ── */
+  .bets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .bet-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .bet-item:hover {
+    border-color: var(--accent);
+    background: rgba(240, 192, 64, 0.05);
+  }
+
+  .bet-item-left {
+    flex: 1;
+  }
+
+  .bet-item-question {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .bet-item-meta {
+    display: flex;
+    gap: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--subtext);
+  }
+
+  .bet-item-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bet-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .status-open { border-color: var(--green); color: var(--green); }
+  .status-proposed { border-color: var(--accent); color: var(--accent); }
+  .status-resolved { border-color: var(--muted); color: var(--muted); }
+
+  .bet-odds {
+    display: flex;
+    gap: 12px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    min-width: 80px;
+  }
+
+  .odds-yes { color: var(--green); }
+  .odds-no { color: var(--red); }
+
+  .empty-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--subtext);
+  }
+
   /* ── Setup panel ── */
   .setup-panel {
     background: var(--surface);
@@ -209,533 +330,705 @@
     transition: border-color 0.15s;
   }
   .bet-input:focus { border-color: var(--accent); }
-
-  .btn-yes, .btn-no, .btn-neutral {
+  .btn-bet {
     font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 500;
-    padding: 11px 28px; border: none; cursor: pointer;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    transition: opacity 0.15s, transform 0.1s;
+    padding: 11px 18px;
+    border: none; cursor: pointer; letter-spacing: 0.06em; white-space: nowrap;
+    transition: opacity 0.15s;
   }
-  .btn-yes    { background: var(--green); color: var(--bg); }
-  .btn-no     { background: var(--red);   color: #fff; }
-  .btn-neutral{ background: var(--accent); color: var(--bg); }
-  .btn-yes:hover, .btn-no:hover, .btn-neutral:hover { opacity: 0.85; }
-  .btn-yes:active, .btn-no:active, .btn-neutral:active { transform: scale(0.97); }
-  button:disabled { opacity: 0.35; cursor: not-allowed; }
-
-  /* Auditor / claim section */
-  .audit-info {
-    font-family: 'DM Mono', monospace; font-size: 0.75rem;
-    color: var(--subtext); line-height: 1.8; margin-bottom: 18px;
+  .btn-yes {
+    background: var(--green); color: var(--bg);
   }
-  .audit-info span { color: var(--accent); }
-  .audit-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-
-  /* ── Status log ── */
-  #statusLog {
-    font-family: 'DM Mono', monospace; font-size: 0.72rem;
-    color: var(--subtext); line-height: 1.9;
-    border-top: 1px solid var(--border);
-    padding-top: 20px; margin-top: 20px;
-    min-height: 32px;
+  .btn-yes:hover:not(:disabled) { opacity: 0.85; }
+  .btn-no {
+    background: var(--red); color: var(--bg);
   }
-  #statusLog .ok   { color: var(--green); }
-  #statusLog .err  { color: var(--red); }
-  #statusLog .info { color: var(--accent); }
-  #statusLog .link { color: var(--accent); text-decoration: underline; }
+  .btn-no:hover:not(:disabled) { opacity: 0.85; }
+  .btn-bet:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 
-  /* ── Outcome banner ── */
-  .outcome-banner {
-    padding: 24px 32px; margin-bottom: 24px;
+  /* Claim section */
+  .claim-section { margin-bottom: 20px; }
+  .btn-claim {
+    font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 500;
+    padding: 11px 24px; background: var(--green); color: var(--bg);
+    border: none; cursor: pointer; letter-spacing: 0.06em;
+    transition: opacity 0.15s;
+  }
+  .btn-claim:hover { opacity: 0.85; }
+
+  /* Audit section */
+  .audit-section { margin-bottom: 20px; }
+  #auditInfo {
+    background: var(--bg); padding: 12px;
+    margin-bottom: 12px; font-size: 0.8rem; line-height: 1.5;
+  }
+  #auditInfo span { color: var(--accent); font-weight: 600; }
+  .audit-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-audit {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 500;
+    padding: 10px 16px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text);
+    cursor: pointer; letter-spacing: 0.06em;
+    transition: all 0.15s;
+  }
+  .btn-audit:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn-audit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Outcome banner */
+  #outcomeBanner {
+    background: var(--surface);
     border: 1px solid var(--green);
-    background: rgba(61,255,160,0.04);
+    padding: 16px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--green);
   }
-  .outcome-banner h3 {
-    font-size: 1.3rem; font-weight: 800;
-    color: var(--green); letter-spacing: -0.02em; margin-bottom: 4px;
+  #outcomeTitle {
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--green);
   }
-  .outcome-banner p {
-    font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--subtext);
-  }
-
-  /* ── Deadline countdown ── */
-  #countdown {
-    font-family: 'DM Mono', monospace; font-size: 0.8rem;
-    color: var(--accent); text-align: right; margin-bottom: 24px;
+  #outcomeDetail {
+    font-size: 0.85rem;
+    color: var(--subtext);
   }
 
-  /* ── Responsive ── */
-  @media(max-width:600px) {
-    .stats { grid-template-columns: 1fr 1fr; }
-    .market-question { font-size: 1.2rem; }
-    .odds-pct span { font-size: 1.2rem; }
+  /* Log sections */
+  .log-section { margin-bottom: 20px; }
+  .log-title {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .log {
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 12px; max-height: 120px; overflow-y: auto;
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    line-height: 1.4;
+  }
+  .log div { padding: 3px 0; }
+  .log .ok  { color: var(--green); }
+  .log .info { color: var(--accent); }
+  .log .err { color: var(--red); }
+  .log .link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+  .back-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--accent);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    transition: all 0.15s;
+  }
+
+  .back-btn:hover {
+    border-color: var(--accent);
+    background: rgba(240, 192, 64, 0.1);
+  }
+
+  @media (max-width: 640px) {
+    .bet-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .bet-item-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .stats {
+      grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .btn-bet {
+      width: 100%;
+    }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- Header -->
+<div class="wrap">
   <header>
     <div class="logo">
-      <span class="logo-mark">G4Market</span>
-      <span class="logo-sub">Sepolia Testnet</span>
+      <div class="logo-mark">⬢</div>
+      <div class="logo-sub">Group 4<br>Prediction Market</div>
     </div>
-    <button id="connectBtn" onclick="connectWallet()">Connect MetaMask</button>
+    <button id="connectBtn">Connect MetaMask</button>
   </header>
 
-  <!-- Setup -->
-  <div class="setup-panel">
-    <h2>Load Market</h2>
-    <div class="setup-row">
-      <div class="field">
-        <label>Contract Address</label>
-        <input id="contractAddr" type="text" placeholder="0x..." spellcheck="false">
-      </div>
-      <div class="field" style="max-width:120px">
-        <label>Market ID</label>
-        <input id="marketIdInput" type="number" value="0" min="0">
-      </div>
-      <button class="btn-load" onclick="loadMarket()">Load</button>
-    </div>
+  <!-- Tabs Container -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('browse')">Browse Markets</button>
+    <button class="tab-btn" onclick="switchTab('detail')">Market Details</button>
   </div>
 
-  <!-- Market card (hidden until loaded) -->
-  <div id="marketCard">
+  <!-- Browse Tab -->
+  <div id="browseTab" class="tab-content active">
+    <div class="bets-list" id="betsList"></div>
+    <div id="emptyMessage" class="empty-message">Loading markets from blockchain...</div>
+  </div>
 
-    <div id="countdown"></div>
+  <!-- Detail Tab -->
+  <div id="detailTab" class="tab-content">
+    <button class="back-btn" onclick="switchTab('browse')">← Back to Browse</button>
 
-    <div class="market-header">
-      <div class="market-question" id="mQuestion">—</div>
-      <div class="phase-badge phase-open" id="phaseBadge">Open</div>
-    </div>
-
-    <!-- Odds bar -->
-    <div class="odds-block">
-      <div class="odds-labels"><span>YES</span><span>NO</span></div>
-      <div class="odds-bar"><div class="odds-yes" id="oddsBar" style="width:50%"></div></div>
-      <div class="odds-pct">
-        <span class="yes-pct" id="yesPct">50%</span>
-        <span class="no-pct"  id="noPct">50%</span>
+    <div id="marketCard">
+      <div class="market-header">
+        <div class="market-question" id="marketQuestion"></div>
+        <div class="phase-badge" id="phaseBadge"></div>
       </div>
-    </div>
 
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-label">YES Pool</div>
-        <div class="stat-value" id="yesPool">— ETH</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">NO Pool</div>
-        <div class="stat-value" id="noPool">— ETH</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Total Pot</div>
-        <div class="stat-value" id="totalPot">— ETH</div>
-      </div>
-    </div>
-
-    <!-- Outcome banner (only when settled) -->
-    <div class="outcome-banner" id="outcomeBanner" style="display:none">
-      <h3 id="outcomeTitle">—</h3>
-      <p id="outcomeDetail">—</p>
-    </div>
-
-    <!-- ── OPEN phase: place bets ── -->
-    <div class="action-panel" id="betPanel">
-      <div class="action-title">Place Your Bet</div>
-      <div class="bet-row">
-        <div class="bet-input-wrap">
-          <label>Amount (ETH)</label>
-          <input class="bet-input" id="betAmount" type="number" step="0.001" min="0.001" value="0.001">
+      <div class="odds-block">
+        <div class="odds-labels">
+          <span>YES</span>
+          <span>NO</span>
         </div>
-        <button class="btn-yes" id="btnYes" onclick="placeBet(true)">YES ↑</button>
-        <button class="btn-no"  id="btnNo"  onclick="placeBet(false)">NO ↓</button>
+        <div class="odds-bar">
+          <div class="odds-yes" id="oddsYes" style="width: 50%"></div>
+        </div>
+        <div class="odds-pct">
+          <span class="yes-pct" id="yesPct">50%</span>
+          <span class="no-pct" id="noPct">50%</span>
+        </div>
       </div>
-      <div id="statusLog"></div>
-    </div>
 
-    <!-- ── PROPOSED phase: auditor vote ── -->
-    <div class="action-panel" id="auditPanel" style="display:none">
-      <div class="action-title">Auditor Vote Required</div>
-      <div class="audit-info" id="auditInfo">Loading auditor info...</div>
-      <div class="audit-btns">
-        <button class="btn-yes"     id="btnAccept" onclick="castAuditorVote(true)">Accept Proposal</button>
-        <button class="btn-no"      id="btnReject" onclick="castAuditorVote(false)">Reject Proposal</button>
-        <button class="btn-neutral" id="btnDecide" onclick="castFinalDecide(true)" style="display:none">Cast Final Decision (YES)</button>
-        <button class="btn-no"      id="btnDecideNo" onclick="castFinalDecide(false)" style="display:none">Cast Final Decision (NO)</button>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Total Pot</div>
+          <div class="stat-value" id="totalPot">0 ETH</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Betting Closes</div>
+          <div class="stat-value" id="countdown">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Your Position</div>
+          <div class="stat-value" id="yourPosition">—</div>
+        </div>
       </div>
-      <div id="auditLog"></div>
-    </div>
 
-    <!-- ── SETTLED phase: claim winnings ── -->
-    <div class="action-panel" id="claimPanel" style="display:none">
-      <div class="action-title">Claim Your Winnings</div>
-      <p style="font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--subtext); margin-bottom:18px">
-        If you bet on the winning side, click below to withdraw your payout.
-      </p>
-      <div style="display:flex; gap:12px; flex-wrap:wrap">
-        <button class="btn-neutral" id="btnClaim" onclick="claimWinnings()">Claim Winnings</button>
-        <button class="btn-neutral" id="btnWithdrawCreator" onclick="withdrawFees('creator')" style="display:none">Withdraw Creator Fees</button>
-        <button class="btn-neutral" id="btnWithdrawDecider" onclick="withdrawFees('decider')" style="display:none">Withdraw Decider Fees</button>
+      <div id="outcomeBanner" style="display: none;">
+        <div id="outcomeTitle">Outcome</div>
+        <div id="outcomeDetail"></div>
       </div>
-      <div id="claimLog"></div>
-    </div>
 
-  </div><!-- /marketCard -->
-</div><!-- /wrap -->
+      <!-- Betting Section -->
+      <div class="action-panel" id="bettingPanel">
+        <div class="action-title">Place a Bet</div>
+        <div class="bet-row">
+          <div class="bet-input-wrap">
+            <label>Amount (ETH)</label>
+            <input type="number" id="betAmount" placeholder="0.01" step="0.001">
+          </div>
+          <button class="btn-bet btn-yes" id="btnYes" onclick="placeBet(true)">Bet YES</button>
+          <button class="btn-bet btn-no" id="btnNo" onclick="placeBet(false)">Bet NO</button>
+        </div>
+      </div>
+
+      <!-- Claim Section -->
+      <div class="claim-section" id="claimSection" style="display:none;">
+        <button class="btn-claim" id="btnClaim" onclick="claimWinnings()">Claim Winnings</button>
+      </div>
+
+      <!-- Audit Section -->
+      <div class="audit-section" id="auditSection" style="display:none;">
+        <div class="action-title">Auditor Vote</div>
+        <div id="auditInfo"></div>
+        <div class="audit-buttons">
+          <button class="btn-audit" id="btnAccept" onclick="castAuditorVote(true)" style="display:none;">Accept Outcome</button>
+          <button class="btn-audit" id="btnReject" onclick="castAuditorVote(false)" style="display:none;">Reject Outcome</button>
+          <button class="btn-audit" id="btnDecide" onclick="castFinalDecide(true)" style="display:none;">Decide YES</button>
+          <button class="btn-audit" id="btnDecideNo" onclick="castFinalDecide(false)" style="display:none;">Decide NO</button>
+        </div>
+      </div>
+
+      <!-- Fee Withdrawal -->
+      <div class="log-section" id="feeSection" style="display:none;">
+        <div class="action-title">Fee Withdrawal</div>
+        <div style="display:flex; gap:12px;">
+          <button class="btn-audit" id="btnWithdrawCreator" onclick="withdrawFees('creator')" style="display:none;">Withdraw Creator Fees</button>
+          <button class="btn-audit" id="btnWithdrawDecider" onclick="withdrawFees('decider')" style="display:none;">Withdraw Decider Fees</button>
+        </div>
+      </div>
+
+      <!-- Logs -->
+      <div class="log-section">
+        <div class="log-title">Status</div>
+        <div class="log" id="statusLog"></div>
+      </div>
+
+      <div class="log-section">
+        <div class="log-title">Audit Log</div>
+        <div class="log" id="auditLog"></div>
+      </div>
+
+      <div class="log-section">
+        <div class="log-title">Claim Log</div>
+        <div class="log" id="claimLog"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-// ============================================================
-//  ABI — paste the output of Group4Market_ABI.json here
-//  OR leave as-is; the minimal ABI below covers all functions
-// ============================================================
-const ABI = [
-  {"inputs":[{"internalType":"address","name":"_company","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
-  {"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"uint256"},{"indexed":true,"name":"bettor","type":"address"},{"indexed":false,"name":"isYes","type":"bool"},{"indexed":false,"name":"netAmount","type":"uint256"}],"name":"BetPlaced","type":"event"},
-  {"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"uint256"},{"indexed":false,"name":"outcomeYes","type":"bool"},{"indexed":false,"name":"hadDispute","type":"bool"}],"name":"MarketSettled","type":"event"},
-  {"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"uint256"},{"indexed":true,"name":"winner","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"WinningsClaimed","type":"event"},
-  {"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"uint256"},{"indexed":false,"name":"decider","type":"address"}],"name":"DeciderPicked","type":"event"},
-  {"inputs":[{"name":"_id","type":"uint256"},{"name":"_acceptProposed","type":"bool"}],"name":"auditorVote","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"}],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"},{"name":"_outcomeYes","type":"bool"}],"name":"finalDecide","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"}],"name":"getMarket","outputs":[
-    {"name":"question","type":"string"},{"name":"creator","type":"address"},
-    {"name":"deadline","type":"uint256"},{"name":"phase","type":"uint8"},
-    {"name":"yesPool","type":"uint256"},{"name":"noPool","type":"uint256"},
-    {"name":"resolved","type":"bool"},{"name":"outcomeYes","type":"bool"},
-    {"name":"yesAuditor","type":"address"},{"name":"noAuditor","type":"address"},
-    {"name":"finalDecider","type":"address"},{"name":"deciderFee","type":"uint256"},
-    {"name":"potAtSettle","type":"uint256"}
-  ],"stateMutability":"view","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"}],"name":"getOdds","outputs":[{"name":"yesPct","type":"uint256"},{"name":"noPct","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"},{"name":"_isYes","type":"bool"}],"name":"claimed","outputs":[{"name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"name":"","type":"uint256"},{"name":"","type":"address"}],"name":"claimed","outputs":[{"name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"}],"name":"placeYes","outputs":[],"stateMutability":"payable","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"}],"name":"placeNo","outputs":[],"stateMutability":"payable","type":"function"},
-  {"inputs":[{"name":"_id","type":"uint256"},{"name":"_outcomeYes","type":"bool"}],"name":"proposeOutcome","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[],"name":"withdrawCreatorFees","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[],"name":"withdrawCompanyFees","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[],"name":"withdrawDeciderFees","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[{"name":"","type":"address"}],"name":"creatorFeeOwed","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"name":"","type":"address"}],"name":"deciderFeeOwed","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"stateMutability":"payable","type":"receive"}
-];
+  const RPC_URL = "https://sepolia.infura.io/v3/f88f43b3adbb4bd398b9465e5d931e4d";
+  const CONTRACT_ADDRESS = "0xb215b5153dafb7Ea3BFc3eaA903E472BD21579F4";
+  const CONTRACT_ABI = [
+    "function getMarketCount() public view returns (uint256)",
+    "function markets(uint256 id) public view returns (address creator, string memory question, uint256 creationTime, uint256 deadline, uint256 phaseEndTime, uint8 phase, uint256 potYes, uint256 potNo, uint256 potAtSettle, uint256 deciderFee, bool outcomeYes, address yesAuditor, address noAuditor, address finalDecider)",
+    "function userBets(address user, uint256 marketId) public view returns (uint256 yesAmount, uint256 noAmount)",
+    "function estimateReturn(uint256 marketId, uint256 amount, bool isYes) public view returns (uint256)",
+    "function placeYes(uint256 marketId) public payable",
+    "function placeNo(uint256 marketId) public payable",
+    "function claim(uint256 marketId) public",
+    "function auditorVote(uint256 marketId, bool accept) public",
+    "function finalDecide(uint256 marketId, bool outcomeYes) public",
+    "function creatorFeeOwed(address creator) public view returns (uint256)",
+    "function deciderFeeOwed(address decider) public view returns (uint256)",
+    "function withdrawCreatorFees() public",
+    "function withdrawDeciderFees() public"
+  ];
 
-// ============================================================
-//  State
-// ============================================================
-let provider, signer, userAddress, contract, contractAddress, marketId;
-let countdownTimer, refreshTimer;
+  let provider, signer, contract, userAddress;
+  let allMarkets = [];
+  let marketId = null;
+  let countdownTimer = null;
 
-const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
-
-const PHASE = { 0: "Open", 1: "Proposed", 2: "Settled" };
-
-// ============================================================
-//  Wallet
-// ============================================================
-async function connectWallet() {
-  if (!window.ethereum) { alert("MetaMask not found — please install it from metamask.io"); return; }
-  try {
-    await window.ethereum.request({ method: "eth_requestAccounts" });
-
-    // Switch to Sepolia if needed
-    const chainId = await window.ethereum.request({ method: "eth_chainId" });
-    if (chainId !== SEPOLIA_CHAIN_ID) {
-      try {
-        await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: SEPOLIA_CHAIN_ID }] });
-      } catch(e) {
-        await window.ethereum.request({ method: "wallet_addEthereumChain", params: [{
-          chainId: SEPOLIA_CHAIN_ID, chainName: "Sepolia Testnet",
-          rpcUrls: ["https://rpc.sepolia.org"],
-          nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-          blockExplorerUrls: ["https://sepolia.etherscan.io"]
-        }]});
-      }
+  // Initialize on page load
+  document.addEventListener("DOMContentLoaded", async () => {
+    if (window.ethereum) {
+      window.ethereum.on("accountsChanged", accounts => {
+        if (accounts.length === 0) {
+          document.getElementById("connectBtn").textContent = "Connect MetaMask";
+          document.getElementById("connectBtn").classList.remove("connected");
+          userAddress = null;
+          signer = null;
+        } else {
+          connectWallet();
+        }
+      });
+      window.ethereum.on("chainChanged", () => location.reload());
     }
+    document.getElementById("connectBtn").onclick = connectWallet;
+    
+    // Auto-fetch all markets on load
+    await loadAllMarkets();
+  });
 
-    provider    = new ethers.BrowserProvider(window.ethereum);
-    signer      = await provider.getSigner();
-    userAddress = await signer.getAddress();
+  // Connect Wallet
+  async function connectWallet() {
+    try {
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      userAddress = accounts[0];
+      provider = new ethers.BrowserProvider(window.ethereum);
+      signer = await provider.getSigner();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
-    const btn = document.getElementById("connectBtn");
-    btn.textContent = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
-    btn.classList.add("connected");
+      const btn = document.getElementById("connectBtn");
+      btn.textContent = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+      btn.classList.add("connected");
 
-    log("statusLog", `Connected: ${userAddress}`, "ok");
-    if (contract) updateUI();
-  } catch(e) {
-    log("statusLog", "Connection failed: " + e.message, "err");
-  }
-}
-
-// ============================================================
-//  Load Market
-// ============================================================
-async function loadMarket() {
-  contractAddress = document.getElementById("contractAddr").value.trim();
-  marketId        = parseInt(document.getElementById("marketIdInput").value);
-
-  if (!ethers.isAddress(contractAddress)) { alert("Invalid contract address"); return; }
-  if (!provider) {
-    // Auto-connect read-only via Sepolia public RPC
-    provider = new ethers.JsonRpcProvider("https://rpc.sepolia.org");
+      log("statusLog", "✓ Connected: " + userAddress, "ok");
+      await renderBetsList();
+    } catch(e) {
+      log("statusLog", "Connection failed: " + e.message, "err");
+    }
   }
 
-  contract = new ethers.Contract(contractAddress, ABI, signer || provider);
-  document.getElementById("marketCard").style.display = "block";
-  await updateUI();
-
-  clearInterval(refreshTimer);
-  refreshTimer = setInterval(updateUI, 10000); // refresh every 10s
-}
-
-// ============================================================
-//  Update UI from chain
-// ============================================================
-async function updateUI() {
-  try {
-    const m    = await contract.getMarket(marketId);
-    const odds = await contract.getOdds(marketId);
-
-    const phase       = Number(m.phase);
-    const yesPool     = ethers.formatEther(m.yesPool);
-    const noPool      = ethers.formatEther(m.noPool);
-    const totalPot    = (parseFloat(yesPool) + parseFloat(noPool)).toFixed(5);
-    const yesPct      = Number(odds.yesPct);
-    const noPct       = Number(odds.noPct);
-    const deadline    = Number(m.deadline);
-    const now         = Math.floor(Date.now() / 1000);
-
-    document.getElementById("mQuestion").textContent = m.question;
-    document.getElementById("yesPool").textContent   = parseFloat(yesPool).toFixed(5) + " ETH";
-    document.getElementById("noPool").textContent    = parseFloat(noPool).toFixed(5) + " ETH";
-    document.getElementById("totalPot").textContent  = totalPot + " ETH";
-    document.getElementById("oddsBar").style.width   = yesPct + "%";
-    document.getElementById("yesPct").textContent    = yesPct + "%";
-    document.getElementById("noPct").textContent     = noPct + "%";
-
-    // Phase badge
-    const badge = document.getElementById("phaseBadge");
-    badge.textContent = PHASE[phase];
-    badge.className   = "phase-badge phase-" + PHASE[phase].toLowerCase();
-
-    // Countdown
-    startCountdown(deadline, phase);
-
-    // Panel visibility
-    document.getElementById("betPanel").style.display     = phase === 0 ? "block" : "none";
-    document.getElementById("auditPanel").style.display   = phase === 1 ? "block" : "none";
-    document.getElementById("claimPanel").style.display   = phase === 2 ? "block" : "none";
-    document.getElementById("outcomeBanner").style.display = phase === 2 ? "block" : "none";
-
-    // Disable bet buttons after deadline
-    const expired = now >= deadline;
-    document.getElementById("btnYes").disabled = expired;
-    document.getElementById("btnNo").disabled  = expired;
-
-    // Outcome banner
-    if (phase === 2) {
-      const netPot = ethers.formatEther(m.potAtSettle - m.deciderFee);
-      document.getElementById("outcomeTitle").textContent =
-        "Outcome: " + (m.outcomeYes ? "YES ✓" : "NO ✓");
-      document.getElementById("outcomeDetail").textContent =
-        `Net pot distributed: ${parseFloat(netPot).toFixed(5)} ETH  |  ` +
-        `Decider fee: ${parseFloat(ethers.formatEther(m.deciderFee)).toFixed(5)} ETH`;
-    }
-
-    // Auditor panel details
-    if (phase === 1 && userAddress) {
-      const yesAud = m.yesAuditor.toLowerCase();
-      const noAud  = m.noAuditor.toLowerCase();
-      const me     = userAddress.toLowerCase();
-      const decider = m.finalDecider?.toLowerCase();
-
-      let auditHTML = `Proposed outcome: <span>${m.outcomeYes ? "YES" : "NO"} (awaiting confirmation)</span><br>`;
-      auditHTML += `YES auditor: <span>${m.yesAuditor}</span><br>`;
-      auditHTML += `NO  auditor: <span>${m.noAuditor}</span><br>`;
-      if (decider && decider !== "0x0000000000000000000000000000000000000000") {
-        auditHTML += `Final decider: <span>${m.finalDecider}</span>`;
+  // Load All Markets from Contract
+  async function loadAllMarkets() {
+    try {
+      provider = new ethers.JsonRpcProvider(RPC_URL);
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+      
+      const count = await contract.getMarketCount();
+      log("statusLog", `Loading ${count} markets from blockchain...`, "info");
+      
+      allMarkets = [];
+      for (let i = 0; i < parseInt(count); i++) {
+        try {
+          const market = await contract.markets(i);
+          let userBets = { yesAmount: 0n, noAmount: 0n };
+          
+          if (userAddress) {
+            userBets = await contract.userBets(userAddress, i);
+          }
+          
+          allMarkets.push({
+            id: i,
+            ...market,
+            userYes: userBets.yesAmount,
+            userNo: userBets.noAmount
+          });
+        } catch(e) {
+          console.error(`Error loading market ${i}:`, e);
+        }
       }
-      document.getElementById("auditInfo").innerHTML = auditHTML;
-
-      const isAuditor = (me === yesAud || me === noAud);
-      const isDecider = decider && me === decider;
-      document.getElementById("btnAccept").style.display   = isAuditor ? "block" : "none";
-      document.getElementById("btnReject").style.display   = isAuditor ? "block" : "none";
-      document.getElementById("btnDecide").style.display   = isDecider ? "block" : "none";
-      document.getElementById("btnDecideNo").style.display = isDecider ? "block" : "none";
-
-      if (!isAuditor && !isDecider) {
-        document.getElementById("auditInfo").innerHTML += "<br><span>Your wallet is not selected as an auditor or decider for this market.</span>";
-      }
+      
+      log("statusLog", `✓ Loaded ${allMarkets.length} markets`, "ok");
+      await renderBetsList();
+    } catch(e) {
+      log("statusLog", "Error loading markets: " + e.message, "err");
     }
-
-    // Show fee withdrawal buttons if relevant
-    if (phase === 2 && userAddress) {
-      const creatorOwed  = await contract.creatorFeeOwed(userAddress);
-      const deciderOwed  = await contract.deciderFeeOwed(userAddress);
-      document.getElementById("btnWithdrawCreator").style.display = creatorOwed > 0n ? "block" : "none";
-      document.getElementById("btnWithdrawDecider").style.display = deciderOwed > 0n ? "block" : "none";
-    }
-
-  } catch(e) {
-    log("statusLog", "Error loading market: " + e.message, "err");
   }
-}
 
-// ============================================================
-//  Countdown
-// ============================================================
-function startCountdown(deadline, phase) {
-  clearInterval(countdownTimer);
-  const el = document.getElementById("countdown");
-  if (phase !== 0) { el.textContent = ""; return; }
-
-  function tick() {
-    const remaining = deadline - Math.floor(Date.now() / 1000);
-    if (remaining <= 0) {
-      el.textContent = "Betting closed — waiting for creator to propose outcome";
-      clearInterval(countdownTimer);
+  // Render Markets List
+  async function renderBetsList() {
+    const list = document.getElementById("betsList");
+    const empty = document.getElementById("emptyMessage");
+    
+    if (allMarkets.length === 0) {
+      list.innerHTML = "";
+      empty.textContent = "No markets found";
+      empty.style.display = "block";
       return;
     }
-    const m = Math.floor(remaining / 60);
-    const s = remaining % 60;
-    el.textContent = `Betting closes in ${m}m ${String(s).padStart(2,"0")}s`;
+    
+    empty.style.display = "none";
+    list.innerHTML = "";
+    
+    // Sort: active first, then resolved
+    const sorted = [...allMarkets].sort((a, b) => {
+      const now = Math.floor(Date.now() / 1000);
+      const aActive = a.phase < 2 && a.deadline > now;
+      const bActive = b.phase < 2 && b.deadline > now;
+      return bActive - aActive;
+    });
+    
+    sorted.forEach(market => {
+      const item = document.createElement("div");
+      item.className = "bet-item";
+      item.onclick = () => selectMarket(market.id);
+      
+      const now = Math.floor(Date.now() / 1000);
+      const isActive = market.phase < 2 && market.deadline > now;
+      const totalPot = market.potYes + market.potNo;
+      const yesPercentage = totalPot > 0 ? (Number(market.potYes) / Number(totalPot) * 100).toFixed(0) : 50;
+      const noPercentage = 100 - yesPercentage;
+      
+      let status = "Open";
+      let statusClass = "status-open";
+      if (market.phase === 2) {
+        status = "Resolved";
+        statusClass = "status-resolved";
+      } else if (market.phase === 1) {
+        status = "Proposed";
+        statusClass = "status-proposed";
+      }
+      
+      let timeText = "Closed";
+      if (isActive) {
+        const remaining = market.deadline - now;
+        const days = Math.floor(remaining / 86400);
+        const hours = Math.floor((remaining % 86400) / 3600);
+        timeText = `${days}d ${hours}h left`;
+      }
+      
+      const poolETH = ethers.formatEther(totalPot);
+      
+      item.innerHTML = `
+        <div class="bet-item-left">
+          <div class="bet-item-question">${market.question}</div>
+          <div class="bet-item-meta">
+            <span>💰 ${parseFloat(poolETH).toFixed(3)} ETH</span>
+            <span>⏱ ${timeText}</span>
+          </div>
+        </div>
+        <div class="bet-item-right">
+          <div class="bet-odds">
+            <span class="odds-yes">${yesPercentage}%</span>
+            <span class="odds-no">${noPercentage}%</span>
+          </div>
+          <div class="bet-status ${statusClass}">${status}</div>
+        </div>
+      `;
+      
+      list.appendChild(item);
+    });
   }
-  tick();
-  countdownTimer = setInterval(tick, 1000);
-}
 
-// ============================================================
-//  Place Bet
-// ============================================================
-async function placeBet(isYes) {
-  if (!signer) { alert("Connect your wallet first"); return; }
-  const amtStr = document.getElementById("betAmount").value;
-  const amt    = parseFloat(amtStr);
-  if (!amt || amt <= 0) { alert("Enter a valid ETH amount"); return; }
-
-  const btn = isYes ? document.getElementById("btnYes") : document.getElementById("btnNo");
-  btn.disabled = true;
-
-  try {
-    log("statusLog", `Sending ${isYes ? "YES" : "NO"} bet of ${amt} ETH...`, "info");
-    const c  = contract.connect(signer);
-    const fn = isYes ? c.placeYes : c.placeNo;
-    const tx = await fn(marketId, { value: ethers.parseEther(amtStr) });
-    log("statusLog", `TX submitted → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
-    await tx.wait();
-    log("statusLog", `✓ Bet confirmed! You bet ${amt} ETH on ${isYes ? "YES" : "NO"}`, "ok");
-    await updateUI();
-  } catch(e) {
-    log("statusLog", "Bet failed: " + (e.reason || e.message), "err");
+  // Select Market and Show Details
+  function selectMarket(id) {
+    marketId = id;
+    updateUI();
+    switchTab('detail');
   }
-  btn.disabled = false;
-}
 
-// ============================================================
-//  Auditor Vote
-// ============================================================
-async function castAuditorVote(accept) {
-  if (!signer) { alert("Connect your wallet first"); return; }
-  try {
-    log("auditLog", `Voting: ${accept ? "ACCEPT" : "REJECT"} proposed outcome...`, "info");
-    const tx = await contract.connect(signer).auditorVote(marketId, accept);
-    log("auditLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
-    await tx.wait();
-    log("auditLog", `✓ Vote recorded`, "ok");
-    await updateUI();
-  } catch(e) {
-    log("auditLog", "Vote failed: " + (e.reason || e.message), "err");
-  }
-}
-
-// ============================================================
-//  Final Decide
-// ============================================================
-async function castFinalDecide(outcomeYes) {
-  if (!signer) { alert("Connect your wallet first"); return; }
-  try {
-    log("auditLog", `Final decision: ${outcomeYes ? "YES" : "NO"}...`, "info");
-    const tx = await contract.connect(signer).finalDecide(marketId, outcomeYes);
-    log("auditLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
-    await tx.wait();
-    log("auditLog", `✓ Market resolved by final decider`, "ok");
-    await updateUI();
-  } catch(e) {
-    log("auditLog", "Decision failed: " + (e.reason || e.message), "err");
-  }
-}
-
-// ============================================================
-//  Claim Winnings
-// ============================================================
-async function claimWinnings() {
-  if (!signer) { alert("Connect your wallet first"); return; }
-  try {
-    log("claimLog", "Claiming winnings...", "info");
-    const tx = await contract.connect(signer).claim(marketId);
-    log("claimLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
-    const receipt = await tx.wait();
-    log("claimLog", "✓ Winnings claimed!", "ok");
-    await updateUI();
-  } catch(e) {
-    log("claimLog", "Claim failed: " + (e.reason || e.message), "err");
-  }
-}
-
-// ============================================================
-//  Withdraw Fees
-// ============================================================
-async function withdrawFees(type) {
-  if (!signer) { alert("Connect your wallet first"); return; }
-  try {
-    log("claimLog", `Withdrawing ${type} fees...`, "info");
-    const fn =
-      type === "creator"  ? contract.connect(signer).withdrawCreatorFees() :
-      type === "decider"  ? contract.connect(signer).withdrawDeciderFees() :
-                            contract.connect(signer).withdrawCompanyFees();
-    const tx = await fn;
-    log("claimLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
-    await tx.wait();
-    log("claimLog", `✓ ${type} fees withdrawn`, "ok");
-    await updateUI();
-  } catch(e) {
-    log("claimLog", "Withdrawal failed: " + (e.reason || e.message), "err");
-  }
-}
-
-// ============================================================
-//  Log helper
-// ============================================================
-function log(targetId, msg, type = "") {
-  const el = document.getElementById(targetId);
-  if (!el) return;
-  const line = document.createElement("div");
-  if (type) line.classList.add(type);
-  line.innerHTML = msg;
-  el.appendChild(line);
-  el.scrollTop = el.scrollHeight;
-}
-
-// ============================================================
-//  Auto-detect MetaMask account changes
-// ============================================================
-if (window.ethereum) {
-  window.ethereum.on("accountsChanged", accounts => {
-    if (accounts.length === 0) {
-      document.getElementById("connectBtn").textContent = "Connect MetaMask";
-      document.getElementById("connectBtn").classList.remove("connected");
-      userAddress = null; signer = null;
+  // Switch Tab
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    
+    if (tab === 'browse') {
+      document.getElementById('browseTab').classList.add('active');
+      document.querySelector('[onclick="switchTab(\'browse\')"]').classList.add('active');
     } else {
-      connectWallet();
+      document.getElementById('detailTab').classList.add('active');
+      document.querySelector('[onclick="switchTab(\'detail\')"]').classList.add('active');
     }
-  });
-  window.ethereum.on("chainChanged", () => location.reload());
-}
+  }
+
+  // ============================================================
+  //  Update UI with market details
+  // ============================================================
+  async function updateUI() {
+    if (marketId === null) return;
+    
+    try {
+      if (!signer) {
+        provider = new ethers.JsonRpcProvider(RPC_URL);
+        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+      }
+      
+      const m = allMarkets.find(x => x.id === marketId);
+      if (!m) return;
+      
+      document.getElementById("marketCard").style.display = "block";
+      document.getElementById("marketQuestion").textContent = m.question;
+
+      const now = Math.floor(Date.now() / 1000);
+      const phase = m.phase;
+      const deadline = m.deadline;
+
+      // Phase badge
+      const badge = document.getElementById("phaseBadge");
+      badge.textContent = phase === 2 ? "SETTLED" : phase === 1 ? "PROPOSED" : "OPEN";
+      badge.className = phase === 2 ? "phase-badge phase-settled" : phase === 1 ? "phase-badge phase-proposed" : "phase-badge phase-open";
+
+      // Odds
+      const totalPot = m.potYes + m.potNo;
+      const yesPercentage = totalPot > 0 ? Number(m.potYes) / Number(totalPot) : 0.5;
+      document.getElementById("oddsYes").style.width = (yesPercentage * 100) + "%";
+      document.getElementById("yesPct").textContent = (yesPercentage * 100).toFixed(1) + "%";
+      document.getElementById("noPct").textContent = ((1 - yesPercentage) * 100).toFixed(1) + "%";
+
+      // Pot
+      const potETH = ethers.formatEther(totalPot);
+      document.getElementById("totalPot").textContent = parseFloat(potETH).toFixed(5) + " ETH";
+
+      // Your position
+      const yETH = ethers.formatEther(m.userYes);
+      const nETH = ethers.formatEther(m.userNo);
+      let posText = "—";
+      if (m.userYes > 0n) posText = parseFloat(yETH).toFixed(3) + " ETH on YES";
+      if (m.userNo > 0n) posText = parseFloat(nETH).toFixed(3) + " ETH on NO";
+      document.getElementById("yourPosition").textContent = posText;
+
+      // Countdown
+      startCountdown(deadline, phase);
+
+      // Show/hide sections
+      const expired = now >= deadline;
+      document.getElementById("bettingPanel").style.display = phase === 0 && !expired ? "block" : "none";
+      document.getElementById("claimSection").style.display = phase === 2 && (m.userYes > 0n || m.userNo > 0n) ? "block" : "none";
+      document.getElementById("auditSection").style.display = phase === 1 ? "block" : "none";
+      document.getElementById("feeSection").style.display = phase === 2 ? "block" : "none";
+
+      document.getElementById("btnYes").disabled = expired;
+      document.getElementById("btnNo").disabled  = expired;
+
+      document.getElementById("outcomeBanner").style.display = phase === 2 ? "block" : "none";
+      if (phase === 2) {
+        const netPot = ethers.formatEther(m.potAtSettle - m.deciderFee);
+        document.getElementById("outcomeTitle").textContent = "Outcome: " + (m.outcomeYes ? "YES ✓" : "NO ✓");
+        document.getElementById("outcomeDetail").textContent =
+          `Net pot distributed: ${parseFloat(netPot).toFixed(5)} ETH  |  ` +
+          `Decider fee: ${parseFloat(ethers.formatEther(m.deciderFee)).toFixed(5)} ETH`;
+      }
+
+      // Auditor panel
+      if (phase === 1 && userAddress) {
+        const yesAud = m.yesAuditor.toLowerCase();
+        const noAud  = m.noAuditor.toLowerCase();
+        const me     = userAddress.toLowerCase();
+        const decider = m.finalDecider?.toLowerCase();
+
+        let auditHTML = `Proposed outcome: <span>${m.outcomeYes ? "YES" : "NO"} (awaiting confirmation)</span><br>`;
+        auditHTML += `YES auditor: <span>${m.yesAuditor}</span><br>`;
+        auditHTML += `NO  auditor: <span>${m.noAuditor}</span><br>`;
+        if (decider && decider !== "0x0000000000000000000000000000000000000000") {
+          auditHTML += `Final decider: <span>${m.finalDecider}</span>`;
+        }
+        document.getElementById("auditInfo").innerHTML = auditHTML;
+
+        const isAuditor = (me === yesAud || me === noAud);
+        const isDecider = decider && me === decider;
+        document.getElementById("btnAccept").style.display   = isAuditor ? "block" : "none";
+        document.getElementById("btnReject").style.display   = isAuditor ? "block" : "none";
+        document.getElementById("btnDecide").style.display   = isDecider ? "block" : "none";
+        document.getElementById("btnDecideNo").style.display = isDecider ? "block" : "none";
+
+        if (!isAuditor && !isDecider) {
+          document.getElementById("auditInfo").innerHTML += "<br><span>Your wallet is not selected as an auditor or decider for this market.</span>";
+        }
+      }
+
+      // Fee withdrawal
+      if (phase === 2 && userAddress) {
+        const creatorOwed  = await contract.creatorFeeOwed(userAddress);
+        const deciderOwed  = await contract.deciderFeeOwed(userAddress);
+        document.getElementById("btnWithdrawCreator").style.display = creatorOwed > 0n ? "block" : "none";
+        document.getElementById("btnWithdrawDecider").style.display = deciderOwed > 0n ? "block" : "none";
+      }
+
+    } catch(e) {
+      log("statusLog", "Error loading market: " + e.message, "err");
+    }
+  }
+
+  // ============================================================
+  //  Countdown
+  // ============================================================
+  function startCountdown(deadline, phase) {
+    clearInterval(countdownTimer);
+    const el = document.getElementById("countdown");
+    if (phase !== 0) { el.textContent = "—"; return; }
+
+    function tick() {
+      const remaining = deadline - Math.floor(Date.now() / 1000);
+      if (remaining <= 0) {
+        el.textContent = "Betting closed";
+        clearInterval(countdownTimer);
+        return;
+      }
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      el.textContent = `${m}m ${String(s).padStart(2,"0")}s`;
+    }
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  }
+
+  // ============================================================
+  //  Place Bet
+  // ============================================================
+  async function placeBet(isYes) {
+    if (!signer) { alert("Connect your wallet first"); return; }
+    const amtStr = document.getElementById("betAmount").value;
+    const amt    = parseFloat(amtStr);
+    if (!amt || amt <= 0) { alert("Enter a valid ETH amount"); return; }
+
+    const btn = isYes ? document.getElementById("btnYes") : document.getElementById("btnNo");
+    btn.disabled = true;
+
+    try {
+      log("statusLog", `Sending ${isYes ? "YES" : "NO"} bet of ${amt} ETH...`, "info");
+      const c  = contract.connect(signer);
+      const fn = isYes ? c.placeYes : c.placeNo;
+      const tx = await fn(marketId, { value: ethers.parseEther(amtStr) });
+      log("statusLog", `TX submitted → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
+      await tx.wait();
+      log("statusLog", `✓ Bet confirmed! You bet ${amt} ETH on ${isYes ? "YES" : "NO"}`, "ok");
+      await loadAllMarkets();
+      updateUI();
+    } catch(e) {
+      log("statusLog", "Bet failed: " + (e.reason || e.message), "err");
+    }
+    btn.disabled = false;
+  }
+
+  // ============================================================
+  //  Auditor Vote
+  // ============================================================
+  async function castAuditorVote(accept) {
+    if (!signer) { alert("Connect your wallet first"); return; }
+    try {
+      log("auditLog", `Voting: ${accept ? "ACCEPT" : "REJECT"} proposed outcome...`, "info");
+      const tx = await contract.connect(signer).auditorVote(marketId, accept);
+      log("auditLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
+      await tx.wait();
+      log("auditLog", `✓ Vote recorded`, "ok");
+      await loadAllMarkets();
+      updateUI();
+    } catch(e) {
+      log("auditLog", "Vote failed: " + (e.reason || e.message), "err");
+    }
+  }
+
+  // ============================================================
+  //  Final Decide
+  // ============================================================
+  async function castFinalDecide(outcomeYes) {
+    if (!signer) { alert("Connect your wallet first"); return; }
+    try {
+      log("auditLog", `Final decision: ${outcomeYes ? "YES" : "NO"}...`, "info");
+      const tx = await contract.connect(signer).finalDecide(marketId, outcomeYes);
+      log("auditLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
+      await tx.wait();
+      log("auditLog", `✓ Market resolved by final decider`, "ok");
+      await loadAllMarkets();
+      updateUI();
+    } catch(e) {
+      log("auditLog", "Decision failed: " + (e.reason || e.message), "err");
+    }
+  }
+
+  // ============================================================
+  //  Claim Winnings
+  // ============================================================
+  async function claimWinnings() {
+    if (!signer) { alert("Connect your wallet first"); return; }
+    try {
+      log("claimLog", "Claiming winnings...", "info");
+      const tx = await contract.connect(signer).claim(marketId);
+      log("claimLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
+      const receipt = await tx.wait();
+      log("claimLog", "✓ Winnings claimed!", "ok");
+      await loadAllMarkets();
+      updateUI();
+    } catch(e) {
+      log("claimLog", "Claim failed: " + (e.reason || e.message), "err");
+    }
+  }
+
+  // ============================================================
+  //  Withdraw Fees
+  // ============================================================
+  async function withdrawFees(type) {
+    if (!signer) { alert("Connect your wallet first"); return; }
+    try {
+      log("claimLog", `Withdrawing ${type} fees...`, "info");
+      const fn =
+        type === "creator"  ? contract.connect(signer).withdrawCreatorFees() :
+        type === "decider"  ? contract.connect(signer).withdrawDeciderFees() :
+                              contract.connect(signer).withdrawCompanyFees();
+      const tx = await fn;
+      log("claimLog", `TX → <a class="link" href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">${tx.hash.slice(0,18)}...</a>`, "info");
+      await tx.wait();
+      log("claimLog", `✓ ${type} fees withdrawn`, "ok");
+      await loadAllMarkets();
+      updateUI();
+    } catch(e) {
+      log("claimLog", "Withdrawal failed: " + (e.reason || e.message), "err");
+    }
+  }
+
+  // ============================================================
+  //  Log helper
+  // ============================================================
+  function log(targetId, msg, type = "") {
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    const line = document.createElement("div");
+    if (type) line.classList.add(type);
+    line.innerHTML = msg;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
 </script>
 </body>
 </html>
