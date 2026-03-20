@@ -327,7 +327,7 @@
   <div class="config-bar">
     <div class="config-field" style="flex:2">
       <label>Contract Address</label>
-      <input id="contract-addr" type="text" value="0x3BdF3Da9C2541550D902a8AAE25C1ad386D22c4C" placeholder="0x…" />
+      <input id="contract-addr" type="text" value="0x5f0348e5587D4Cd52814d799C9AB7Aa75fe076F0" placeholder="0x…" />
     </div>
     <button class="btn btn-primary" onclick="loadMarkets()" id="load-btn">
       <span class="spinner" id="load-spinner" style="display:none"></span>
@@ -364,7 +364,7 @@
 <div id="toast-root"></div>
 
 <script>
-const CONTRACT_ADDRESS = '0x3BdF3Da9C2541550D902a8AAE25C1ad386D22c4C';
+const CONTRACT_ADDRESS = '0x5f0348e5587D4Cd52814d799C9AB7Aa75fe076F0';
 const ABI = [
   "function marketCount() view returns (uint256)",
   "function getMarket(uint256) view returns (string question, address creator, uint256 deadline, uint8 phase, uint256 yesPool, uint256 noPool, bool resolved, bool outcomeYes, address yesAuditor, address noAuditor, address finalDecider, uint256 deciderFee, uint256 potAtSettle)",
